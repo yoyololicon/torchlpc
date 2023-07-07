@@ -1,6 +1,6 @@
 import pytest
 import torch
-from torch.autograd import gradcheck
+from torch.autograd import gradcheck, gradgradcheck
 from torchlpc.core import LPC
 
 
@@ -44,3 +44,4 @@ def test_low_order(
     zi.requires_grad = zi_requires_grad
 
     assert gradcheck(LPC.apply, (x, A, zi))
+    assert gradgradcheck(LPC.apply, (x, A, zi))
