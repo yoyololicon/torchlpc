@@ -20,14 +20,20 @@ from torchlpc.core import LPC
     "samples",
     [32],
 )
+@pytest.mark.parametrize(
+    "device",
+    ["cpu", "cuda"],
+)
 def test_low_order(
     x_requires_grad: bool,
     a_requires_grad: bool,
     zi_requires_grad: bool,
     samples: int,
+    device: str,
 ):
     start_coeffs = [-0.9, 0.0]
     end_coeffs = [0.0, 1]
+    device = torch.device(device)
 
     A = (
         torch.stack(
@@ -35,9 +41,10 @@ def test_low_order(
         )
         .T.unsqueeze(0)
         .double()
+        .to(device)
     )
-    x = torch.randn(1, samples).double()
-    zi = torch.randn(1, 2).double()
+    x = torch.randn(1, samples).double().to(device)
+    zi = torch.randn(1, 2).double().to(device)
 
     A.requires_grad = a_requires_grad
     x.requires_grad = x_requires_grad
