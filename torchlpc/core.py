@@ -1,12 +1,12 @@
 import torch
 import numpy as np
 import torch.nn.functional as F
-from torch.autograd import Function, gradcheck
+from torch.autograd import Function
 from typing import Any, Tuple, Optional
 from numba import jit, njit, prange
 
 
-@jit(nopython=True, parallel=True, cache=True)
+@njit(parallel=True, cache=True)
 def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> None:
     B, T = x.shape
     order = zi.shape[1]
@@ -27,12 +27,8 @@ def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> None:
 
 class LPC(Function):
     @staticmethod
-    def forward(
-        x: torch.Tensor, A: torch.Tensor, zi: Optional[torch.Tensor] = None
-    ) -> torch.Tensor:
+    def forward(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor:
         B, T, order = A.shape
-        if zi is None:
-            zi = A.new_zeros(B, order)
 
         y = lpc_np(
             x.detach().cpu().numpy(),
@@ -43,11 +39,7 @@ class LPC(Function):
 
     @staticmethod
     def setup_context(ctx: Any, inputs: Tuple[Any], output: Any) -> Any:
-        zi = None
-        if len(inputs) == 3:
-            _, A, zi = inputs
-        else:
-            _, A = inputs
+        _, A, zi = inputs
         ctx.save_for_backward(A, zi, output)
 
     @staticmethod
@@ -73,7 +65,9 @@ class LPC(Function):
         else:
             padded_grad_y = F.pad(grad_y.unsqueeze(1), (order, 0)).squeeze(1)
 
-        flipped_grad_x = LPC.apply(padded_grad_y.flip(1), shifted_A.flip(1))
+        flipped_grad_x = LPC.apply(
+            padded_grad_y.flip(1), shifted_A.flip(1), torch.zeros_like(zi)
+        )
 
         if ctx.needs_input_grad[2]:
             grad_zi = flipped_grad_x[:, -order:]
