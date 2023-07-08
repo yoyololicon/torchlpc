@@ -2,3 +2,5 @@
 .vscode/
 *.nbc
 *.nbi
+build/
+*.egg*
