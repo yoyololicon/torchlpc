@@ -42,9 +42,10 @@ def test_low_order(
         .T.unsqueeze(0)
         .double()
         .to(device)
+        .repeat(4, 1, 1)
     )
-    x = torch.randn(1, samples).double().to(device)
-    zi = torch.randn(1, 2).double().to(device)
+    x = torch.randn(4, samples).double().to(device)
+    zi = torch.randn(4, 2).double().to(device)
 
     A.requires_grad = a_requires_grad
     x.requires_grad = x_requires_grad
