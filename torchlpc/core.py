@@ -7,7 +7,7 @@ from numba import jit, njit, prange, cuda, float32, float64
 
 
 @cuda.jit(cache=True)
-def lpc_cuda_kernel(padded_y, A, B, T, order) -> None:
+def lpc_cuda_kernel_float64(padded_y, A, B, T, order) -> None:
     sm = cuda.shared.array(shape=(1024,), dtype=float64)
 
     blockDim = cuda.blockDim.x
@@ -30,15 +30,50 @@ def lpc_cuda_kernel(padded_y, A, B, T, order) -> None:
         tmp_idx = j * order + circular_idx
         if i == (order - 1):
             sm[tmp_idx] *= -A[b, t, i]
-            sm[tmp_idx] += padded_y[b, t + order]
         cuda.syncthreads()
 
-        if i < (order - 1):
-            cuda.atomic.add(
-                sm,
-                tmp_idx,
-                -A[b, t, i] * sm[j * order + (circular_idx - i - 1 + order) % order],
-            )
+        if i == (order - 1):
+            v = padded_y[b, t + order]
+        else:
+            v = -A[b, t, i] * sm[j * order + (circular_idx - i - 1 + order) % order]
+        cuda.atomic.add(sm, tmp_idx, v)
+        cuda.syncthreads()
+
+        if i == 0:
+            padded_y[b, t + order] = sm[tmp_idx]
+        cuda.syncthreads()
+
+
+def lpc_cuda_kernel_float32(padded_y, A, B, T, order) -> None:
+    sm = cuda.shared.array(shape=(1024,), dtype=float32)
+
+    blockDim = cuda.blockDim.x
+    batch_idx = cuda.blockIdx.x * blockDim
+    tid = cuda.threadIdx.x
+
+    i = tid % order
+    j = tid // order
+    b = j + batch_idx
+
+    if b >= B:
+        return
+
+    circular_idx = 0
+    sm[j * order + i] = padded_y[b, i]
+    cuda.syncthreads()
+
+    for t in range(T):
+        circular_idx = t % order
+        tmp_idx = j * order + circular_idx
+        if i == (order - 1):
+            sm[tmp_idx] *= -A[b, t, i]
+        cuda.syncthreads()
+
+        if i == (order - 1):
+            v = padded_y[b, t + order]
+        else:
+            v = -A[b, t, i] * sm[j * order + (circular_idx - i - 1 + order) % order]
+        cuda.atomic.add(sm, tmp_idx, v)
         cuda.syncthreads()
 
         if i == 0:
@@ -54,9 +89,15 @@ def lpc_cuda(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor
 
     threads_per_block = min(1024 // order * order, B * order)
     blocks_per_grid = (B * order + threads_per_block - 1) // threads_per_block
-    lpc_cuda_kernel[blocks_per_grid, threads_per_block](
-        cuda.as_cuda_array(padded_y), cuda.as_cuda_array(A), B, T, order
-    )
+
+    if x.dtype == torch.float64:
+        lpc_cuda_kernel_float64[blocks_per_grid, threads_per_block](
+            cuda.as_cuda_array(padded_y), cuda.as_cuda_array(A), B, T, order
+        )
+    else:
+        lpc_cuda_kernel_float32[blocks_per_grid, threads_per_block](
+            cuda.as_cuda_array(padded_y), cuda.as_cuda_array(A), B, T, order
+        )
 
     return padded_y[:, order:]
 
