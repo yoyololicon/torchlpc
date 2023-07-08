@@ -17,8 +17,8 @@ setuptools.setup(
     description="Fast, efficient, and differentiable time-varying LPC filtering in PyTorch.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yoyololicon/torchlpc",
-    packages=setuptools.find_packages(),
+    url="https://github.com/yoyololicon/pytorch-LPC",
+    packages=["torchlpc"],
     install_requires=["torch", "numpy", "numba"],
     classifiers=[
         "Programming Language :: Python :: 3",
