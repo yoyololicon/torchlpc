@@ -21,7 +21,6 @@ def lpc_cuda_kernel_float64(padded_y, A, B, T, order) -> None:
 
     circular_idx = 0
     sm[i] = padded_y[b, i]
-    cuda.syncthreads()
 
     for t in range(T):
         circular_idx = t % order
@@ -36,9 +35,8 @@ def lpc_cuda_kernel_float64(padded_y, A, B, T, order) -> None:
         cuda.atomic.add(sm, circular_idx, v)
         cuda.syncthreads()
 
-        if i == 0:
+        if i == (order - 1):
             padded_y[b, t + order] = sm[circular_idx]
-        cuda.syncthreads()
 
 
 @cuda.jit
@@ -55,7 +53,6 @@ def lpc_cuda_kernel_float32(padded_y, A, B, T, order) -> None:
 
     circular_idx = 0
     sm[i] = padded_y[b, i]
-    cuda.syncthreads()
 
     for t in range(T):
         circular_idx = t % order
@@ -70,9 +67,8 @@ def lpc_cuda_kernel_float32(padded_y, A, B, T, order) -> None:
         cuda.atomic.add(sm, circular_idx, v)
         cuda.syncthreads()
 
-        if i == 0:
+        if i == (order - 1):
             padded_y[b, t + order] = sm[circular_idx]
-        cuda.syncthreads()
 
 
 def lpc_cuda(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor:
