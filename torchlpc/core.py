@@ -110,13 +110,12 @@ def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> None:
     padded_y[:, :order] = zi[:, ::-1]
     padded_y[:, order:] = x
 
-    for t in range(T):
-        # ref = padded_y[:, t + order]
-        # for i in prange(order):
-        #     ref -= A[:, t, i] * padded_y[:, t + order - i - 1]
-        padded_y[:, t + order] -= np.sum(
-            A[:, t, ::-1] * padded_y[:, t : t + order], axis=1
-        )
+    for b in prange(B):
+        for t in range(T):
+            ref = padded_y[b, t + order]
+            for i in prange(order):
+                ref -= A[b, t, i] * padded_y[b, t + order - i - 1]
+            padded_y[b, t + order] = ref
 
     return padded_y[:, order:]
 
