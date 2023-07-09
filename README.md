@@ -4,10 +4,10 @@
 It's fast, differentiable, and supports batched inputs with time-varying filter coefficients.
 The computation is done as follows:
 
-Given an input signal $\mathbf{x} \in \mathbb{R}^T$ and time-varying LPC coefficients $\mathbf{a} \in \mathbb{R}^{T \times N}$ with an order of $N$, the LPC filtering operation is defined as:
+Given an input signal $\mathbf{x} \in \mathbb{R}^T$ and time-varying LPC coefficients $\mathbf{A} \in \mathbb{R}^{T \times N}$ with an order of $N$, the LPC filtering operation is defined as:
 
 ```math
-\mathbf{y}_t = \mathbf{x}_t - \sum_{i=1}^N \mathbf{a}_{t,i} \mathbf{x}_{t-i}.
+\mathbf{y}_t = \mathbf{x}_t - \sum_{i=1}^N \mathbf{A}_{t,i} \mathbf{x}_{t-i}.
 ```
 
 It's still in early development, so please open an issue if you find any bugs.
@@ -23,14 +23,14 @@ from torchlpc import sample_wise_lpc
 x = torch.randn(10, 100)
 
 # Create a batch of 10 sets of LPC coefficients, each with 100 time steps and an order of 3
-a = torch.randn(10, 100, 3)
+A = torch.randn(10, 100, 3)
 
 # Apply LPC filtering
-y = sample_wise_lpc(x, a)
+y = sample_wise_lpc(x, A)
 
 # Optionally, you can provide initial values for the output signal (default is 0)
 zi = torch.randn(10, 3)
-y = sample_wise_lpc(x, a, zi=zi)
+y = sample_wise_lpc(x, A, zi=zi)
 ```
 
 
