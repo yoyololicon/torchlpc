@@ -48,7 +48,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 
 ## Derivation of the gradients of the LPC filtering operation
 
-Will (not) be added soon... I'm not good at math :swet_smile:.
+Will (not) be added soon... I'm not good at math :sweat_smile:.
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.
 The algorithm is extended from my recent paper **GOLF**[^1].
 
