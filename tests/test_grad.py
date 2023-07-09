@@ -77,7 +77,6 @@ def test_low_order_cuda(
     samples: int,
 ):
     batch_size = 4
-    samples = 32
     x, A, zi = create_test_inputs(batch_size, samples)
     x = x.cuda()
     A = A.cuda()
