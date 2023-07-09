@@ -6,9 +6,9 @@ The computation is done as follows:
 
 Given an input signal $\mathbf{x} \in \mathbb{R}^T$ and time-varying LPC coefficients $\mathbf{a} \in \mathbb{R}^{T \times N}$ with an order of $N$, the LPC filtering operation is defined as:
 
-$$
+```math
 \mathbf{y}_t = \mathbf{x}_t - \sum_{i=1}^N \mathbf{a}_{t,i} \mathbf{x}_{t-i}.
-$$
+```
 
 It's still in early development, so please open an issue if you find any bugs.
 
