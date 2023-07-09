@@ -50,7 +50,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 
 Will (not) be added soon... I'm not good at math :swet_smile:.
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.
-The algorithm is extended from my recent paper *golf*[^1].
+The algorithm is extended from my recent paper **GOLF**[^1].
 
 [^1]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
 
