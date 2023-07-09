@@ -4,7 +4,7 @@ authors:
 - family-names: "Yu"
   given-names: "Chin-Yun"
   orcid: "https://orcid.org/0000-0003-3782-2713"
-title: "torchlpc"
+title: "TorchLPC: fast, efficient, and differentiable time-varying LPC filtering in PyTorch"
 version: 0.1.0
 date-released: 2023-07-09
 url: "https://github.com/yoyololicon/torchlpc"
