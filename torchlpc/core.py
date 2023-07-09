@@ -167,10 +167,7 @@ class LPC(Function):
 
         if ctx.needs_input_grad[1]:
             valid_y = y[:, :-1]
-            if zi is None:
-                padded_y = F.pad(valid_y.unsqueeze(1), (order, 0)).squeeze(1)
-            else:
-                padded_y = torch.cat([zi.flip(1), valid_y], dim=1)
+            padded_y = torch.cat([zi.flip(1), valid_y], dim=1)
 
             unfolded_y = padded_y.unfold(1, order, 1).flip(2)
             grad_A = unfolded_y * -flipped_grad_x.flip(1).unsqueeze(2)
