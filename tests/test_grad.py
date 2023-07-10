@@ -88,3 +88,23 @@ def test_low_order_cuda(
 
     assert gradcheck(LPC.apply, (x, A, zi))
     assert gradgradcheck(LPC.apply, (x, A, zi))
+
+
+def test_float64_vs_32_cuda():
+    batch_size = 4
+    samples = 32
+    x, A, zi = create_test_inputs(batch_size, samples)
+    x = x.cuda()
+    A = A.cuda()
+    zi = zi.cuda()
+
+    x32 = x.float()
+    A32 = A.float()
+    zi32 = zi.float()
+
+    y64 = LPC.apply(x, A, zi)
+    y32 = LPC.apply(x32, A32, zi32)
+
+    assert torch.allclose(y64, y32.double(), atol=1e-6), torch.max(
+        torch.abs(y64 - y32.double())
+    )
