@@ -30,8 +30,10 @@ def lpc_cuda_kernel_float64(padded_y, A, B, T, order) -> None:
 
         if i == (order - 1):
             v = padded_y[b, t + order]
+        elif i > circular_idx - 1:
+            v = -A[b, t, i] * sm[circular_idx - i - 1 + order]
         else:
-            v = -A[b, t, i] * sm[(circular_idx - i - 1 + order) % order]
+            v = -A[b, t, i] * sm[circular_idx - i - 1]
         cuda.atomic.add(sm, circular_idx, v)
         cuda.syncthreads()
 
@@ -62,8 +64,10 @@ def lpc_cuda_kernel_float32(padded_y, A, B, T, order) -> None:
 
         if i == (order - 1):
             v = padded_y[b, t + order]
+        elif i > circular_idx - 1:
+            v = -A[b, t, i] * sm[circular_idx - i - 1 + order]
         else:
-            v = -A[b, t, i] * sm[(circular_idx - i - 1 + order) % order]
+            v = -A[b, t, i] * sm[circular_idx - i - 1]
         cuda.atomic.add(sm, circular_idx, v)
         cuda.syncthreads()
 
