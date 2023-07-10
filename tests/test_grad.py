@@ -90,6 +90,7 @@ def test_low_order_cuda(
     assert gradgradcheck(LPC.apply, (x, A, zi))
 
 
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 def test_float64_vs_32_cuda():
     batch_size = 4
     samples = 32
