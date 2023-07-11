@@ -119,21 +119,20 @@ def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> None:
 
 class LPC(Function):
     @staticmethod
-    def forward(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor:
+    def forward(
+        ctx: Any, x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor
+    ) -> torch.Tensor:
         if x.is_cuda:
-            return lpc_cuda(x.detach(), A.detach(), zi.detach())
-
-        y = lpc_np(
-            x.detach().cpu().numpy(),
-            A.detach().cpu().numpy(),
-            zi.detach().cpu().numpy(),
-        )
-        return torch.from_numpy(y).to(x.device, x.dtype)
-
-    @staticmethod
-    def setup_context(ctx: Any, inputs: Tuple[Any], output: Any) -> Any:
-        _, A, zi = inputs
-        ctx.save_for_backward(A, zi, output)
+            y = lpc_cuda(x.detach(), A.detach(), zi.detach())
+        else:
+            y = lpc_np(
+                x.detach().cpu().numpy(),
+                A.detach().cpu().numpy(),
+                zi.detach().cpu().numpy(),
+            )
+            y = torch.from_numpy(y).to(x.device, x.dtype)
+        ctx.save_for_backward(A, zi, y)
+        return y
 
     @staticmethod
     def backward(
