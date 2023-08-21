@@ -57,7 +57,7 @@ The algorithm is extended from my recent paper **GOLF**[^1].
 
 ### Propagating gradients to the input $x_t$
 
-Firstly, let me introduce $\hat{A}_ {t,i}  = -A_{t,i}$ so we can get rid of the (a bit annoying) minus sign and write the filtering as (equation 1):
+Firstly, let me introduce $`\hat{A}_{t,i}  = -A_{t,i}`$ so we can get rid of the (a bit annoying) minus sign and write the filtering as (equation 1):
 ```math
 y_t = x_t + \sum_{i=1}^N \hat{A}_{t,i} y_{t-i}.
 ```
@@ -73,7 +73,7 @@ B_{t,i}
 ```
 (The exact value of $B_{t,i}$ is just for completeness and doesn't matter for the following proof.)
 
-It's clear that $\frac{\partial y_t}{\partial x_l}|_ {l < t} = B_{t, t-l}$ and $\frac{\partial y_t}{\partial x_t} = 1$.
+It's clear that $`\frac{\partial y_t}{\partial x_l}|_{l < t} = B_{t, t-l}`$ and $\frac{\partial y_t}{\partial x_t} = 1$.
 Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, thus, equals to (equation 3)
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
