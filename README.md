@@ -68,7 +68,7 @@ y_t = x_t + \sum_{i=1}^{t-1} B_{t,i} x_{t-i},
 ```math
 B_{t,i} 
 = \sum_{j=1}^i 
-\sum_{\{\mathbf{\alpha}: \mathbf{\alpha} \in {\mathbb{Z}}^{j+1}, \alpha_1 = 0, \alpha_k|_{k > 1} \geq 1, \sum_{k=1}^j \alpha_k = i\}}
+\sum_{\{\mathbf{\alpha}: \mathbf{\alpha} \in {\mathbb{Z}}^{j+1}, \alpha_1 = 0, i \geq \alpha_k|_{k > 1} \geq 1, \sum_{k=1}^j \alpha_k = i\}}
 \prod_{k=1}^j \hat{A}_{t - \sum_{l=1}^k\alpha_{l}, \alpha_{k+1}}.
 ```
 (The exact value of $`B_{t,i}`$ is just for completeness and doesn't matter for the following proof.)
