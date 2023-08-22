@@ -51,7 +51,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 ~~Will (not) be added soon... I'm not good at math :sweat_smile:.
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.~~
 
-To make the filter be differentiable and efficient and the same time, I derived the close formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
+To make the filter be differentiable and efficient at the same time, I derived the close formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
 The algorithm is extended from my recent paper **GOLF**[^1].
 
 
