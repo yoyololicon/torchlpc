@@ -51,7 +51,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 ~~Will (not) be added soon... I'm not good at math :sweat_smile:.
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.~~
 
-To make the filter be differentiable and efficient at the same time, I derived the close formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
+To make the filter be differentiable and efficient at the same time, I derived the closed formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
 The algorithm is extended from our recent paper **GOLF**[^1].
 
 
@@ -86,7 +86,7 @@ Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future o
 = \frac{\partial \mathcal{L}}{\partial y_t}
 + \sum_{i = 1}^{T - t} \frac{\partial \mathcal{L}}{\partial y_{t+i}} B_{t+i,i}.
 ```
-Interestingly, the above equation equals and behaves the same as the time-varying FIR form (Eq. 2) if $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$, implies that 
+Interestingly, the above equation equals and behaves the same as the time-varying FIR form (Eq. 2) if we set $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$, implies that 
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
 = \frac{\partial \mathcal{L}}{\partial y_t}
@@ -97,10 +97,10 @@ In summary, getting the gradients for the time-varying IIR filter input is easy 
 
 ### Propagating gradients to the coefficients $\mathbf{A}$
 
-My explanation of this is based on a high-level view of backpropagation.
+The explanation of this section is based on a high-level view of backpropagation.
 
 In each step $t$, we feed two types of inputs to the system.
-One is $x_t$, the others are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
+One is $x_t$, the rest are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
 Clearly, the gradients arrived at $t$ are the same for all inputs ($` \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}|_{1 \leq i \leq N} = \frac{\partial \mathcal{L}}{\partial x_t}`$).
 Thus, 
 
@@ -127,10 +127,10 @@ It uses the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\parti
 ,
 \mathbf{Y} = 
 \begin{vmatrix}
-y_1 & y_0 & \dots & y_{-N + 1} \\
-y_2 & y_1 & \dots & y_{-N + 2} \\
+y_0 & y_{-1} & \dots & y_{-N + 1} \\
+y_1 & y_0 & \dots & y_{-N + 2} \\
 \vdots & \vdots & \ddots & \vdots \\
-y_T & y_{T - 1} & \dots & y_{T - N}
+y_{T-1} & y_{T - 2} & \dots & y_{T - N}
 \end{vmatrix}
 .
 ```
@@ -141,7 +141,7 @@ The algorithm could be extended for modelling initial conditions based on the sa
 The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{\partial x_t}|_{-N < t \leq 0}`$. 
 You can imaginate that $`x_t|_{1 \leq t \leq T}`$ just represent a segment of the whole signal $x_t$ and $y_t|_{t \leq 0}$ are the system outputs based on $`x_t|_{t \leq 0}`$.
 The [initial rest condition](#derivation-of-the-gradients-of-the-lpc-filtering-operation) still holds but happens somewhere $t \leq -N$.
-In practice, running the backward filter for $N$ more steps at the end, then we get the gradients.
+In practice, we get the gradients by running the backward filter for $N$ more steps at the end.
 
 ### Time-invariant filtering
 
@@ -151,12 +151,10 @@ In the time-invariant setting, $`A_{t', i} = A_{t, i} \forall t, t' \in [1, T]`$
 y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
 ```
 
-The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ with $\mathbf{a}$ backwards in time, same as in the time-varying case.
+The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering $`\frac{\partial \mathcal{L}}{\partial \mathbf{y}}`$ with $\mathbf{a}$ backwards in time, same as in the time-varying case.
 For $`\frac{\partial \mathcal{L}}{\partial \mathbf{a}}`$, instead of matrices multiplication, we do a vecotr-matrix multiplication $`-\frac{\partial \mathcal{L}}{\partial \mathbf{x}} \mathbf{Y}`$.
-You can think of the difference as summarising the gradients for $a_i$ at all the time steps thus eliminating the time axis.
+You can think of the difference as summarising the gradients for $a_i$ at all the time steps, eliminating the time axis.
 This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
-
-
 
 [^1]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
 
