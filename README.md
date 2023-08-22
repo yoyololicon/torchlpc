@@ -109,8 +109,8 @@ Thus,
 ```
 
 We don't need to evaluate $`\frac{\partial y_{t-i}}{\partial \hat{A}_{t,i}}`$ because of causality.
-This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
-It uses the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ first, and then $`\frac{\partial \mathcal{L}}{\partial \mathbf{A}}`$ is simply doing matrices multiplication $`\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} \mathbf{Y} `$ where
+In summary, the whole backpropagation runs as the following.
+It uses the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ first, and then $`\frac{\partial \mathcal{L}}{\partial \mathbf{A}}`$ is simply doing matrices multiplication $`-\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} \mathbf{Y} `$ where
 
 ```math
 \mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} = 
@@ -134,14 +134,24 @@ y_T & y_{T - 1} & \dots & y_{T - N}
 ### Gradients for the initial condition $y_t|_{t \leq 0}$
 
 The algorithm could be extended for modeling initial conditions based on the same idea from previous [section](#propagating-gradients-to-the-coefficients).
-The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{x_t}|_{-N < t \leq 0}`$. 
+The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{\partial x_t}|_{-N < t \leq 0}`$. 
 You can imaginate that $`x_t|_{1 \leq t \leq T}`$ just represent a segment of the whole signal $x_t$ and $y_t|_{t \leq 0}$ are the system outputs based on $`x_t|_{t \leq 0}`$.
 The [initial rest condition](#derivation-of-the-gradients-of-the-lpc-filtering-operation) still holds but happens somewhere $t \leq -N$.
-In partice, running the backward filter for $N$ more steps at the end then we get the gradients.
+In practice, running the backward filter for $N$ more steps at the end then we get the gradients.
 
 ### Reduce to time-invarient filtering
 
-WIP.
+In the time-invariant setting, $`A_{t', i} = A_{t, i} \forall t, t' \in [1, T]`$ and the filtering operation is simplified to
+
+$$
+y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
+$$
+The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ with $\mathbf{a}$ backward in time, same as in the time-varying case.
+For $`\frac{\partial \mathcal{L}}{\partial \mathbf{a}}`$, instead of matrices multiplication, we do a vecotr-matrix multiplication $`-\frac{\partial \mathcal{L}}{\partial \mathbf{x}} \mathbf{Y}`$.
+You can think the difference as summarising the gradients to $a_i$ at all the time steps thus eliminate the time axis.
+This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
+
+
 
 [^1]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
 
