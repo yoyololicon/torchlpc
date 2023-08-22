@@ -89,7 +89,7 @@ Interestingly, the above equation equals and behaves the same as the time-varyin
 + \sum_{i=1}^{T - t} \hat{A}_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}}.
 ```
 
-In summary, getting the gradients for the time-varying IIR filter input is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted row-wised.
+In summary, getting the gradients for the time-varying IIR filter input is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted column-wised.
 
 ### Propagating gradients to the coefficients $\mathbf{A}$
 
