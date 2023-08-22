@@ -4,7 +4,7 @@
 It's fast, differentiable, and supports batched inputs with time-varying filter coefficients.
 The computation is done as follows:
 
-Given an input signal $\mathbf{x} \in \mathbb{R}^T$ and time-varying LPC coefficients $\mathbf{A} \in \mathbb{R}^{T \times N}$ with an order of $N$, the LPC filtering operation is defined as:
+Given an input signal $`\mathbf{x} \in \mathbb{R}^T`$ and time-varying LPC coefficients $`\mathbf{A} \in \mathbb{R}^{T \times N}`$ with an order of $`N`$, the LPC filtering operation is defined as:
 
 $$
 y_t = x_t - \sum_{i=1}^N A_{t,i} y_{t-i}.
@@ -71,7 +71,7 @@ B_{t,i}
 \sum_{\{\mathbf{\alpha}: \mathbf{\alpha} \in {\mathbb{Z}}^{j+1}, \alpha_1 = 0, \alpha_k|_{k > 1} \geq 1, \sum_{k=1}^j \alpha_k = i\}}
 \prod_{k=1}^j \hat{A}_{t - \sum_{l=1}^k\alpha_{l}, \alpha_{k+1}}.
 ```
-(The exact value of $B_{t,i}$ is just for completeness and doesn't matter for the following proof.)
+(The exact value of $`B_{t,i}`$ is just for completeness and doesn't matter for the following proof.)
 
 It's clear that $`\frac{\partial y_t}{\partial x_l}|_{l < t} = B_{t, t-l}`$ and $\frac{\partial y_t}{\partial x_t} = 1$.
 Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, thus, equals to (equation 3)
@@ -93,7 +93,43 @@ In summary, getting the gradients respect to the time-varying IIR filter input i
 
 ### Propagating gradients to the coefficients $\mathbf{A}$
 
-WIP.
+My explanation of this based on a high level view of backpropagation.
+
+In each step $t$, we feed two type of inputs to the system.
+One is $x_t$, the other are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
+Clearly, the gradients arrived at $t$ are the same for all inputs ($` \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}|_{1 \leq i \leq N} = \frac{\partial \mathcal{L}}{\partial x_t}`$).
+Thus, 
+
+$$
+\frac{\partial \mathcal{L}}{\partial A_{t,i}}
+= \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}
+\frac{\partial \hat{A}_{t,i}y_{t-i}}{\partial \hat{A}_{t,i}}
+\frac{\partial \hat{A}_{t,i}}{\partial A_{t,i}}
+= -\frac{\partial \mathcal{L}}{\partial x_t} y_{t-i}.
+$$
+
+We don't need to evaluate $`\frac{\partial y_{t-i}}{\partial \hat{A}_{t,i}}`$ because of causality.
+This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
+It use the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ first, and then $`\frac{\partial \mathcal{L}}{\partial \mathbf{A}}`$ is simply doing matrices multiplication $`\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} \mathbf{Y} `$ where
+
+$$
+\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} = 
+\begin{vmatrix}
+\frac{\partial \mathcal{L}}{\partial x_1} & 0 & \dots & 0 \\
+0 & \frac{\partial \mathcal{L}}{\partial x_2} & \dots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \dots & \frac{\partial \mathcal{L}}{\partial x_t}
+\end{vmatrix}
+,
+\mathbf{Y} = 
+\begin{vmatrix}
+y_1 & y_0 & \dots & y_{-N + 1} \\
+y_2 & y_1 & \dots & y_{-N + 2} \\
+\vdots & \vdots & \ddots & \vdots \\
+y_T & y_{T - 1} & \dots & y_{T - N}
+\end{vmatrix}
+.
+$$
 
 ### Gradients for the initial condition $y_t|_{t \leq 0}$
 
