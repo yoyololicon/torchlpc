@@ -93,26 +93,26 @@ In summary, getting the gradients respect to the time-varying IIR filter input i
 
 ### Propagating gradients to the coefficients $\mathbf{A}$
 
-My explanation of this based on a high level view of backpropagation.
+My explanation of this is based on a high-level view of backpropagation.
 
-In each step $t$, we feed two type of inputs to the system.
-One is $x_t$, the other are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
+In each step $t$, we feed two types of inputs to the system.
+One is $x_t$, the others are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
 Clearly, the gradients arrived at $t$ are the same for all inputs ($` \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}|_{1 \leq i \leq N} = \frac{\partial \mathcal{L}}{\partial x_t}`$).
 Thus, 
 
-$$
+```math
 \frac{\partial \mathcal{L}}{\partial A_{t,i}}
 = \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}
 \frac{\partial \hat{A}_{t,i}y_{t-i}}{\partial \hat{A}_{t,i}}
 \frac{\partial \hat{A}_{t,i}}{\partial A_{t,i}}
 = -\frac{\partial \mathcal{L}}{\partial x_t} y_{t-i}.
-$$
+```
 
 We don't need to evaluate $`\frac{\partial y_{t-i}}{\partial \hat{A}_{t,i}}`$ because of causality.
 This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
-It use the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ first, and then $`\frac{\partial \mathcal{L}}{\partial \mathbf{A}}`$ is simply doing matrices multiplication $`\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} \mathbf{Y} `$ where
+It uses the same filter coefficients to get $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ first, and then $`\frac{\partial \mathcal{L}}{\partial \mathbf{A}}`$ is simply doing matrices multiplication $`\mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} \mathbf{Y} `$ where
 
-$$
+```math
 \mathbf{D}_{\frac{\partial \mathcal{L}}{\partial \mathbf{x}}} = 
 \begin{vmatrix}
 \frac{\partial \mathcal{L}}{\partial x_1} & 0 & \dots & 0 \\
@@ -129,7 +129,7 @@ y_2 & y_1 & \dots & y_{-N + 2} \\
 y_T & y_{T - 1} & \dots & y_{T - N}
 \end{vmatrix}
 .
-$$
+```
 
 ### Gradients for the initial condition $y_t|_{t \leq 0}$
 
