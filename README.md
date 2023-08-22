@@ -52,10 +52,10 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.~~
 
 To make the filter be differentiable and efficient at the same time, I derived the close formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
-The algorithm is extended from my recent paper **GOLF**[^1].
+The algorithm is extended from out recent paper **GOLF**[^1].
 
 
-In the following derivations, I'll assume $x_t$, $y_t$, and $A_{t, :}$ are zeros for $t \leq 0, t > T$ cuz we're dealing with finite signal.
+In the following derivations, I assume $x_t$, $y_t$, and $A_{t, :}$ are zeros for $t \leq 0, t > T$ cuz we're dealing with finite signal.
 $\mathcal{L}$ represents the loss evaluated with a chosen function.
 
 
