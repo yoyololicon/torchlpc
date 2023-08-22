@@ -133,7 +133,11 @@ y_T & y_{T - 1} & \dots & y_{T - N}
 
 ### Gradients for the initial condition $y_t|_{t \leq 0}$
 
-WIP.
+The algorithm could be extended for modeling initial conditions based on the same idea from previous [section](#propagating-gradients-to-the-coefficients).
+The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{x_t}|_{-N < t \leq 0}`$. 
+You can imaginate that $`x_t|_{1 \leq t \leq T}`$ just represent a segment of the whole signal $x_t$ and $y_t|_{t \leq 0}$ are the system outputs based on $`x_t|_{t \leq 0}`$.
+The [initial rest condition](#derivation-of-the-gradients-of-the-lpc-filtering-operation) still holds but happens somewhere $t \leq -N$.
+In partice, running the backward filter for $N$ more steps at the end then we get the gradients.
 
 ### Reduce to time-invarient filtering
 
