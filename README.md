@@ -81,7 +81,7 @@ f(\mathbf{\beta})_k = \sum_{l=1}^k\beta_{l},
 ```
 
 ```math
-Q_i^j = \{[0; \mathbf{\alpha}]: \mathbf{\alpha} \in {\mathbb{Z}}^{j} \cap [1, i], \sum_{k=1}^j \alpha_k = i\}.
+Q_i^j = \{[0; \mathbf{\alpha}]: \mathbf{\alpha} \in  [1, i - j + 1]^j, \sum_{k=1}^j \alpha_k = i\}.
 ```
 
 (The exact value of $`B_{t,i}`$ is just for completeness and doesn't matter for the following proof.)
