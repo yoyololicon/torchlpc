@@ -1,10 +1,10 @@
 # TorchLPC
 
-`torchlpc` provides a PyTorch implementation of the Linear Predictive Coding (LPC) filtering operation, also known as IIR filtering.
+`torchlpc` provides a PyTorch implementation of the Linear Predictive Coding (LPC) filter, also known as IIR filtering.
 It's fast, differentiable, and supports batched inputs with time-varying filter coefficients.
 The computation is done as follows:
 
-Given an input signal $`\mathbf{x} \in \mathbb{R}^T`$ and time-varying LPC coefficients $`\mathbf{A} \in \mathbb{R}^{T \times N}`$ with an order of $`N`$, the LPC filtering operation is defined as:
+Given an input signal $`\mathbf{x} \in \mathbb{R}^T`$ and time-varying LPC coefficients $`\mathbf{A} \in \mathbb{R}^{T \times N}`$ with an order of $`N`$, the LPC filter is defined as:
 
 $$
 y_t = x_t - \sum_{i=1}^N A_{t,i} y_{t-i}.
@@ -46,14 +46,13 @@ or from source
 pip install git+https://github.com/yoyololicon/torchlpc.git
 ```
 
-## Derivation of the gradients of the LPC filtering operation
+## Derivation of the gradients of the LPC filter
 
 ~~Will (not) be added soon... I'm not good at math :sweat_smile:.
 But the implementation passed both `gradcheck` and `gradgradcheck` tests, so I think it's 99.99% correct and workable :laughing:.~~
 
-To make the filter be differentiable and efficient at the same time, I derived the closed formulation of backpropagating gradients through a time-varying IIR filter and used non-differentiable fast IIR filters for both forward and backward computation.
+To make the filter be differentiable and efficient at the same time, I derived the closed formulation of backpropagating gradients through a time-varying IIR filter and use non-differentiable implementation of IIR filters for both forward and backward computation.
 The algorithm is extended from our recent paper **GOLF**[^1].
-
 
 In the following derivations, I assume $x_t$, $y_t$, and $A_{t, :}$ are zeros for $t \leq 0, t > T$ cuz we're dealing with finite signal.
 $\mathcal{L}$ represents the loss evaluated with a chosen function.
@@ -61,24 +60,30 @@ $\mathcal{L}$ represents the loss evaluated with a chosen function.
 
 ### Propagating gradients to the input $x_t$
 
-Firstly, let me introduce $`\hat{A}_{t,i}  = -A_{t,i}`$ so we can get rid of the (a bit annoying) minus sign and write the filtering as (equation 1):
+Firstly, let me introduce $`\hat{A}_{t,i}  = -A_{t,i}`$ so we can get rid of the (a bit annoying) minus sign and write the filter as (equation 1):
 ```math
 y_t = x_t + \sum_{i=1}^N \hat{A}_{t,i} y_{t-i}.
 ```
-The time-varying IIR filtering is equivalent to the following time-varying FIR filtering (equation 2):
+The time-varying IIR filter is equivalent to the following time-varying FIR filter (equation 2):
 ```math
 y_t = x_t + \sum_{i=1}^{t-1} B_{t,i} x_{t-i},
 ```
+
 ```math
 B_{t,i} 
 = \sum_{j=1}^i 
-\sum_{\{\mathbf{\alpha}: \mathbf{\alpha} \in {\mathbb{Z}}^{j+1}, \alpha_1 = 0, i \geq \alpha_k|_{k > 1} \geq 1, \sum_{k=1}^j \alpha_k = i\}}
-\prod_{k=1}^j \hat{A}_{t - \sum_{l=1}^k\alpha_{l}, \alpha_{k+1}}.
+\sum_{\mathbf{\beta} \in Q_i^j}
+\prod_{k=1}^j \hat{A}_{t - \sum_{l=1}^k\beta_{l}, \beta_{k+1}},
 ```
+
+```math
+Q_i^j = \{[0; \mathbf{\alpha}]: \mathbf{\alpha} \in {\mathbb{Z}}^{j} \cap [1, i], \sum_{k=1}^j \alpha_k = i\}.
+```
+
 (The exact value of $`B_{t,i}`$ is just for completeness and doesn't matter for the following proof.)
 
 It's clear that $`\frac{\partial y_t}{\partial x_l}|_{l < t} = B_{t, t-l}`$ and $\frac{\partial y_t}{\partial x_t} = 1$.
-Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, thus, equals to (equation 3)
+Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, equals to (equation 3)
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
 = \frac{\partial \mathcal{L}}{\partial y_t}
@@ -86,22 +91,23 @@ Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future o
 = \frac{\partial \mathcal{L}}{\partial y_t}
 + \sum_{i = 1}^{T - t} \frac{\partial \mathcal{L}}{\partial y_{t+i}} B_{t+i,i}.
 ```
-Interestingly, the above equation equals and behaves the same as the time-varying FIR form (Eq. 2) if we set $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$, implies that 
+Interestingly, the time-varying FIR formulation (Eq. 2) equals to Eq. 3 if we set $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$.
+Moreover, we can get $B_{t + i, i}$ by setting $`A_{t,i} := A_{t+i,i}`$, implies that 
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
 = \frac{\partial \mathcal{L}}{\partial y_t}
 + \sum_{i=1}^{T - t} \hat{A}_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}}.
 ```
 
-In summary, getting the gradients for the time-varying IIR filter input is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted column-wised.
+In summary, getting the gradients for the time-varying IIR filter inputs is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted column-wised.
 
 ### Propagating gradients to the coefficients $\mathbf{A}$
 
 The explanation of this section is based on a high-level view of backpropagation.
 
-In each step $t$, we feed two types of inputs to the system.
+In each step $t$, we feed two types of variables to the system.
 One is $x_t$, the rest are $`\hat{A}_{t,1}y_{t-1}, \hat{A}_{t,2}y_{t-2} \dots`$.
-Clearly, the gradients arrived at $t$ are the same for all inputs ($` \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}|_{1 \leq i \leq N} = \frac{\partial \mathcal{L}}{\partial x_t}`$).
+Clearly, the gradients arrived at $t$ are the same for all variables ($` \frac{\partial \mathcal{L}}{\partial \hat{A}_{t,i}y_{t-i}}|_{1 \leq i \leq N} = \frac{\partial \mathcal{L}}{\partial x_t}`$).
 Thus, 
 
 ```math
@@ -145,7 +151,7 @@ In practice, we get the gradients by running the backward filter for $N$ more st
 
 ### Time-invariant filtering
 
-In the time-invariant setting, $`A_{t', i} = A_{t, i} \forall t, t' \in [1, T]`$ and the filtering operation is simplified to
+In the time-invariant setting, $`A_{t', i} = A_{t, i} \forall t, t' \in [1, T]`$ and the filter is simplified to
 
 ```math
 y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
