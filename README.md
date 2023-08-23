@@ -87,7 +87,7 @@ Q_i^j = \{[0; \mathbf{\alpha}]: \mathbf{\alpha} \in  [1, i - j + 1]^j, \sum_{k=1
 (The exact value of $`B_{t,i}`$ is just for completeness and doesn't matter for the following proof.)
 
 It's clear that $`\frac{\partial y_t}{\partial x_l}|_{l < t} = B_{t, t-l}`$ and $\frac{\partial y_t}{\partial x_t} = 1$.
-Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, equals to (equation 3)
+Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future outputs $y_{t+i}|_{i \geq 1}$, equals (equation 3)
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
 = \frac{\partial \mathcal{L}}{\partial y_t}
@@ -95,7 +95,7 @@ Our target, $\frac{\partial \mathcal{L}}{\partial x_t}$, depends on all future o
 = \frac{\partial \mathcal{L}}{\partial y_t}
 + \sum_{i = 1}^{T - t} \frac{\partial \mathcal{L}}{\partial y_{t+i}} B_{t+i,i}.
 ```
-Interestingly, the time-varying FIR formulation (Eq. 2) equals to Eq. 3 if we set $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$.
+Interestingly, the time-varying FIR formulation (Eq. 2) equals Eq. 3 if we set $x_t := \frac{\partial \mathcal{L}}{\partial y_{T - t + 1}}$ and $B_{t, i} := B_{t + i, i}$.
 Moreover, we can get $B_{t + i, i}$ by setting $`A_{t,i} := A_{t+i,i}`$, implies that 
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
