@@ -73,7 +73,11 @@ y_t = x_t + \sum_{i=1}^{t-1} B_{t,i} x_{t-i},
 B_{t,i} 
 = \sum_{j=1}^i 
 \sum_{\mathbf{\beta} \in Q_i^j}
-\prod_{k=1}^j \hat{A}_{t - \sum_{l=1}^k\beta_{l}, \beta_{k+1}},
+\prod_{k=1}^j \hat{A}_{t - f(\mathbf{\beta})_k, \beta_{k+1}},
+```
+
+```math
+f(\mathbf{\beta})_k = \sum_{l=1}^k\beta_{l},
 ```
 
 ```math
