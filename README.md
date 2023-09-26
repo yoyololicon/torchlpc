@@ -58,7 +58,7 @@ In the following derivations, I assume $x_t$, $y_t$, and $A_{t, :}$ are zeros fo
 $\mathcal{L}$ represents the loss evaluated with a chosen function.
 
 
-### Propagating gradients to the input $x_t$
+### Propagating gradients to the input $`x_t`$
 
 Firstly, let me introduce $`\hat{A}_{t,i}  = -A_{t,i}`$ so we can get rid of the (a bit annoying) minus sign and write the filter as (equation 1):
 ```math
@@ -105,7 +105,7 @@ Moreover, we can get $B_{t + i, i}$ by setting $`A_{t,i} := A_{t+i,i}`$, implies
 
 In summary, getting the gradients for the time-varying IIR filter inputs is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted column-wised.
 
-### Propagating gradients to the coefficients $\mathbf{A}$
+### Propagating gradients to the coefficients $`\mathbf{A}`$
 
 The explanation of this section is based on a high-level view of backpropagation.
 
@@ -145,7 +145,7 @@ y_{T-1} & y_{T - 2} & \dots & y_{T - N}
 .
 ```
 
-### Gradients for the initial condition $y_t|_{t \leq 0}$
+### Gradients for the initial condition $`y_t|_{t \leq 0}`$
 
 The algorithm could be extended for modelling initial conditions based on the same idea from the previous [section](#propagating-gradients-to-the-coefficients).
 The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{\partial x_t}|_{-N < t \leq 0}`$. 
