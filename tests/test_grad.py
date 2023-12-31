@@ -49,7 +49,7 @@ def test_low_order_cpu(
     x.requires_grad = x_requires_grad
     zi.requires_grad = zi_requires_grad
 
-    assert gradcheck(LPC.apply, (x, A, zi))
+    assert gradcheck(LPC.apply, (x, A, zi), check_forward_ad=True)
     assert gradgradcheck(LPC.apply, (x, A, zi))
 
 
@@ -86,7 +86,7 @@ def test_low_order_cuda(
     x.requires_grad = x_requires_grad
     zi.requires_grad = zi_requires_grad
 
-    assert gradcheck(LPC.apply, (x, A, zi))
+    assert gradcheck(LPC.apply, (x, A, zi), check_forward_ad=True)
     assert gradgradcheck(LPC.apply, (x, A, zi))
 
 
