@@ -132,6 +132,11 @@ class LPC(Function):
             )
             y = torch.from_numpy(y).to(x.device, x.dtype)
         ctx.save_for_backward(A, zi, y)
+
+        # for jvp
+        ctx.y = y
+        ctx.A = A
+        ctx.zi = zi
         return y
 
     @staticmethod
@@ -176,3 +181,26 @@ class LPC(Function):
             grad_A = unfolded_y * -flipped_grad_x.flip(1).unsqueeze(2)
 
         return grad_x, grad_A, grad_zi
+
+    @staticmethod
+    def jvp(
+        ctx: Any, grad_x: torch.Tensor, grad_A: torch.Tensor, grad_zi: torch.Tensor
+    ) -> torch.Tensor:
+        A, y, zi = ctx.A, ctx.y, ctx.zi
+        *_, order = A.shape
+
+        grad_y = 0
+
+        if grad_x is not None:
+            grad_y_from_x_zi = LPC.apply(grad_x, A, grad_zi)
+            grad_y = grad_y_from_x_zi
+
+        if grad_A is not None:
+            unfolded_y = (
+                torch.cat([zi.flip(1), y[:, :-1]], dim=1).unfold(1, order, 1).flip(2)
+            )
+            grad_A_input = -torch.sum(unfolded_y * grad_A, dim=2)
+            grad_y_from_A = LPC.apply(grad_A_input, A, torch.zeros_like(zi))
+            grad_y = grad_y + grad_y_from_A
+
+        return grad_y
