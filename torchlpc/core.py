@@ -96,7 +96,7 @@ def lpc_cuda(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor
     else:
         raise NotImplementedError
 
-    return padded_y[:, order:]
+    return padded_y[:, order:].contiguous()
 
 
 @njit(parallel=True)
