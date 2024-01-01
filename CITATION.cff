@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "Yu"
-  given-names: "Chin-Yun"
-  orcid: "https://orcid.org/0000-0003-3782-2713"
+  - family-names: "Yu"
+    given-names: "Chin-Yun"
+    orcid: "https://orcid.org/0000-0003-3782-2713"
 title: "TorchLPC: fast, efficient, and differentiable time-varying LPC filtering in PyTorch"
-version: 0.1.0
+version: 0.3.1
 date-released: 2023-07-09
 url: "https://github.com/yoyololicon/torchlpc"
