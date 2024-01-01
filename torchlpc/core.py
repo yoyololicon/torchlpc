@@ -189,18 +189,14 @@ class LPC(Function):
         A, y, zi = ctx.A, ctx.y, ctx.zi
         *_, order = A.shape
 
-        grad_y = 0
-
-        if grad_x is not None:
-            grad_y_from_x_zi = LPC.apply(grad_x, A, grad_zi)
-            grad_y = grad_y_from_x_zi
+        fwd_zi = grad_zi if grad_zi is not None else torch.zeros_like(zi)
+        fwd_x = grad_x if grad_x is not None else torch.zeros_like(y)
 
         if grad_A is not None:
             unfolded_y = (
                 torch.cat([zi.flip(1), y[:, :-1]], dim=1).unfold(1, order, 1).flip(2)
             )
-            grad_A_input = -torch.sum(unfolded_y * grad_A, dim=2)
-            grad_y_from_A = LPC.apply(grad_A_input, A, torch.zeros_like(zi))
-            grad_y = grad_y + grad_y_from_A
+            fwd_A = -torch.sum(unfolded_y * grad_A, dim=2)
+            fwd_x = fwd_x + fwd_A
 
-        return grad_y
+        return LPC.apply(fwd_x, A, fwd_zi)
