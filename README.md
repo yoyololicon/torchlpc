@@ -100,7 +100,7 @@ Moreover, we can get $B_{t + i, i}$ by setting $`A_{t,i} := A_{t+i,i}`$, implies
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t} 
 = \frac{\partial \mathcal{L}}{\partial y_t}
-+ \sum_{i=1}^{T - t} \hat{A}_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}}.
++ \sum_{i=1}^{N} \hat{A}_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}}.
 ```
 
 In summary, getting the gradients for the time-varying IIR filter inputs is easy as filtering the backpropagated gradients backwards with the coefficient matrix shifted column-wised.
