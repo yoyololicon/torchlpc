@@ -10,8 +10,6 @@ $$
 y_t = x_t - \sum_{i=1}^N A_{t,i} y_{t-i}.
 $$
 
-It's still in early development, so please open an issue if you find any bugs.
-
 ## Usage
 
 ```python
@@ -51,11 +49,11 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 The details of the derivation can be found in our preprint **Differentiable All-pole Filters for Time-varying Audio Systems**[^1].
 We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $x_t$ and the filter coefficients $A_{t, :}$ can be computed as follows:
 
-$$
+```math
 \frac{\partial \mathcal{L}}{\partial x_t}
 = \frac{\partial \mathcal{L}}{\partial y_t}
 - \sum_{i=1}^{N} A_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}}
-$$
+```
 
 $$
 \frac{\partial \mathcal{L}}{\partial A_{t,i}}
