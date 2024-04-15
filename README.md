@@ -179,11 +179,12 @@ This algorithm is more efficient than [^1] because it only needs one pass of fil
 If you find this repository useful in your research, please cite the repository with the following BibTex entry:
 
 ```bibtex
-@software{torchlpc,
-  author = {Chin-Yun Yu},
-  title = {{TorchLPC}: fast, efficient, and differentiable time-varying {LPC} filtering in {PyTorch}},
-  year = {2023},
-  version = {0.1.0},
-  url = {https://github.com/yoyololicon/torchlpc},
-}
+ @misc{ycy2024diffapf,
+      title={Differentiable All-pole Filters for Time-varying Audio Systems},
+      author={Chin-Yun Yu and Christopher Mitcheltree and Alistair Carson and Stefan Bilbao and Joshua D. Reiss and György Fazekas},
+      year={2024},
+      eprint={2404.07970},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+  }
 ```
