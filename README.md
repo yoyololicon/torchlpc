@@ -47,7 +47,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 ## Derivation of the gradients of the LPC filter
 
 The details of the derivation can be found in our preprint **Differentiable All-pole Filters for Time-varying Audio Systems**[^1].
-We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $\bf x$ and the filter coefficients $\bf A$ can be computed as follows:
+We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $\bf x$ and the filter coefficients $\bf A$ can be expresssed also through a time-varying filter:
 
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t}
