@@ -63,7 +63,7 @@ $$
 ### Gradients for the initial condition $`y_t|_{t \leq 0}`$
 
 The initial conditions provide an entry point at $t=0$ for filtering, as we cannot evaluate $t=-\infty$.
-Let us assume $A_{t, :}|_{t \leq 0} = 0$ so $y_t|_{t \leq 0} = x_t|_{t \leq 0}$, which also means $\frac{\partial \mathcal{L}}{y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{x_t}|_{t \leq 0}$.
+Let us assume $`A_{t, :}|_{t \leq 0} = 0`$ so $`y_t|_{t \leq 0} = x_t|_{t \leq 0}`$, which also means $`\frac{\partial \mathcal{L}}{y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{x_t}|_{t \leq 0}`$.
 Thus, the initial condition gradients are
 
 $$
@@ -73,7 +73,7 @@ $$
 $$
 
 In practice, we pad $N$ and $N \times N$ zeros to the beginning of $\frac{\partial \mathcal{L}}{\partial \bf y}$ and $\mathbf{A}$ before evaluating $\frac{\partial \mathcal{L}}{\partial \bf x}$.
-The first $M$ outputs are the gradients to $y_t|_{t \leq 0}$ and the rest are to $x_t|_{t > 0}$.
+The first $M$ outputs are the gradients to $`y_t|_{t \leq 0}`$ and the rest are to $`x_t|_{t > 0}`$.
 
 ### Time-invariant filtering
 
