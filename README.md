@@ -77,7 +77,7 @@ The first $N$ outputs are the gradients to $`y_t|_{t \leq 0}`$ and the rest are 
 
 ### Time-invariant filtering
 
-In the time-invariant setting, $`A_{t', i} = A_{t, i} \forall t, t' \in [1, T]`$ and the filter is simplified to
+In the time-invariant setting, $`A_{t, i} = A_{1, i} \forall t \in [1, T]`$ and the filter is simplified to
 
 ```math
 y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
