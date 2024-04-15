@@ -1,8 +1,7 @@
 # TorchLPC
 
-`torchlpc` provides a PyTorch implementation of the Linear Predictive Coding (LPC) filter, also known as IIR filtering.
+`torchlpc` provides a PyTorch implementation of the Linear Predictive Coding (LPC) filter, also known as all-pole filter.
 It's fast, differentiable, and supports batched inputs with time-varying filter coefficients.
-The computation is done as follows:
 
 Given an input signal $`\mathbf{x} \in \mathbb{R}^T`$ and time-varying LPC coefficients $`\mathbf{A} \in \mathbb{R}^{T \times N}`$ with an order of $`N`$, the LPC filter is defined as:
 
@@ -56,8 +55,19 @@ We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\part
 ```
 
 $$
-\frac{\partial \mathcal{L}}{\partial A_{t,i}}
-= -\frac{\partial \mathcal{L}}{\partial x_t} y_{t-i}.
+\frac{\partial \mathcal{L}}{\partial \bf A}
+= -\begin{vmatrix}
+\frac{\partial \mathcal{L}}{\partial x_1} & 0 & \dots & 0 \\
+0 & \frac{\partial \mathcal{L}}{\partial x_2} & \dots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \dots & \frac{\partial \mathcal{L}}{\partial x_t}
+\end{vmatrix}
+\begin{vmatrix}
+y_0 & y_{-1} & \dots & y_{-N + 1} \\
+y_1 & y_0 & \dots & y_{-N + 2} \\
+\vdots & \vdots & \ddots & \vdots \\
+y_{T-1} & y_{T - 2} & \dots & y_{T - N}
+\end{vmatrix}.
 $$
 
 ### Gradients for the initial condition $`y_t|_{t \leq 0}`$
