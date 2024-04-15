@@ -62,7 +62,7 @@ $$
 
 ### Gradients for the initial condition $`y_t|_{t \leq 0}`$
 
-The initial conditions provide an entry point at $t=0$ for filtering, as we cannot evaluate $t=-\infty$.
+The initial conditions provide an entry point at $t=1$ for filtering, as we cannot evaluate $t=-\infty$.
 Let us assume $`A_{t, :}|_{t \leq 0} = 0`$ so $`y_t|_{t \leq 0} = x_t|_{t \leq 0}`$, which also means $`\frac{\partial \mathcal{L}}{y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{x_t}|_{t \leq 0}`$.
 Thus, the initial condition gradients are
 
@@ -73,7 +73,7 @@ $$
 $$
 
 In practice, we pad $N$ and $N \times N$ zeros to the beginning of $\frac{\partial \mathcal{L}}{\partial \bf y}$ and $\mathbf{A}$ before evaluating $\frac{\partial \mathcal{L}}{\partial \bf x}$.
-The first $M$ outputs are the gradients to $`y_t|_{t \leq 0}`$ and the rest are to $`x_t|_{t > 0}`$.
+The first $N$ outputs are the gradients to $`y_t|_{t \leq 0}`$ and the rest are to $`x_t|_{t > 0}`$.
 
 ### Time-invariant filtering
 
@@ -84,11 +84,11 @@ y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
 ```
 
 The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering $`\frac{\partial \mathcal{L}}{\partial \mathbf{y}}`$ with $\mathbf{a}$ backwards in time, same as in the time-varying case.
-For $`\frac{\partial \mathcal{L}}{\partial \mathbf{a}}`$, instead of matrices multiplication, we do a vecotr-matrix multiplication $`-\frac{\partial \mathcal{L}}{\partial \mathbf{x}} \mathbf{Y}`$.
-You can think of the difference as summarising the gradients for $a_i$ at all the time steps, eliminating the time axis.
-This algorithm is more efficient than [^1] because it only needs one pass of filtering to get the two gradients while the latter needs two.
+$\frac{\partial \mathcal{L}}{\partial \mathbf{a}}$ is simply summing the gradients for $a_i$ at all the time steps $\frac{\partial \mathcal{L}}{\partial a_i} = \sum_{t=1}^T \frac{\partial \mathcal{L}}{\partial x_t} y_{t-i}$, which can be done by vecotr-matrix multiplication.
+This algorithm is more efficient than [^2] because it only needs one pass of filtering to get the two gradients while the latter needs two.
 
-[^1]: [Differentiable All-pole Filters for Time-varying Audio Systems](https://arxiv.org/abs/2404.07970)
+[^1]: [Differentiable All-pole Filters for Time-varying Audio Systems](https://arxiv.org/abs/2404.07970).
+[^2]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
 
 ## TODO
 
@@ -98,7 +98,7 @@ This algorithm is more efficient than [^1] because it only needs one pass of fil
 
 ## Citation
 
-If you find this repository useful in your research, please cite the repository with the following BibTex entry:
+If you find this repository useful in your research, please cite our work with the following BibTex entry:
 
 ```bibtex
  @misc{ycy2024diffapf,
