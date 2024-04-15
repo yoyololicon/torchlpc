@@ -47,7 +47,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 ## Derivation of the gradients of the LPC filter
 
 The details of the derivation can be found in our preprint **Differentiable All-pole Filters for Time-varying Audio Systems**[^1].
-We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $x_t$ and the filter coefficients $A_{t, :}$ can be computed as follows:
+We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $\bf x$ and the filter coefficients $\bf A$ can be computed as follows:
 
 ```math
 \frac{\partial \mathcal{L}}{\partial x_t}
@@ -62,11 +62,18 @@ $$
 
 ### Gradients for the initial condition $`y_t|_{t \leq 0}`$
 
-The algorithm could be extended for modelling initial conditions based on the same idea from the previous [section](#propagating-gradients-to-the-coefficients).
-The initial conditions are the inputs to the system when $t \leq 0$, so their gradients equal $`\frac{\partial \mathcal{L}}{\partial x_t}|_{-N < t \leq 0}`$. 
-You can imaginate that $`x_t|_{1 \leq t \leq T}`$ just represent a segment of the whole signal $x_t$ and $y_t|_{t \leq 0}$ are the system outputs based on $`x_t|_{t \leq 0}`$.
-The [initial rest condition](#derivation-of-the-gradients-of-the-lpc-filtering-operation) still holds but happens somewhere $t \leq -N$.
-In practice, we get the gradients by running the backward filter for $N$ more steps at the end.
+The initial conditions provide an entry point at $t=0$ for filtering, as we cannot evaluate $t=-\infty$.
+Let us assume $A_{t, :}|_{t \leq 0} = 0$ so $y_t|_{t \leq 0} = x_t|_{t \leq 0}$, which also means $\frac{\partial \mathcal{L}}{y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{x_t}|_{t \leq 0}$.
+Thus, the initial condition gradients are
+
+$$
+\frac{\partial \mathcal{L}}{\partial y_t} 
+= \frac{\partial \mathcal{L}}{\partial x_t}
+= -\sum_{i=1-t}^{N} A_{t+i,i} \frac{\partial \mathcal{L}}{\partial x_{t+i}} \quad \text{for } -N < t \leq 0.
+$$
+
+In practice, we pad $N$ and $N \times N$ zeros to the beginning of $\frac{\partial \mathcal{L}}{\partial \bf y}$ and $\mathbf{A}$ before evaluating $\frac{\partial \mathcal{L}}{\partial \bf x}$.
+The first $M$ outputs are the gradients to $y_t|_{t \leq 0}$ and the rest are to $x_t|_{t > 0}$.
 
 ### Time-invariant filtering
 
