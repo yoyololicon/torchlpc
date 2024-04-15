@@ -123,12 +123,12 @@ This algorithm is more efficient than [^2] because it only needs one pass of fil
 If you find this repository useful in your research, please cite our work with the following BibTex entry:
 
 ```bibtex
- @misc{ycy2024diffapf,
-      title={Differentiable All-pole Filters for Time-varying Audio Systems},
-      author={Chin-Yun Yu and Christopher Mitcheltree and Alistair Carson and Stefan Bilbao and Joshua D. Reiss and György Fazekas},
-      year={2024},
-      eprint={2404.07970},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS}
-  }
+@misc{ycy2024diffapf,
+    title={Differentiable All-pole Filters for Time-varying Audio Systems},
+    author={Chin-Yun Yu and Christopher Mitcheltree and Alistair Carson and Stefan Bilbao and Joshua D. Reiss and György Fazekas},
+    year={2024},
+    eprint={2404.07970},
+    archivePrefix={arXiv},
+    primaryClass={eess.AS}
+}
 ```
