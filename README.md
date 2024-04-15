@@ -63,7 +63,7 @@ $$
 ### Gradients for the initial condition $`y_t|_{t \leq 0}`$
 
 The initial conditions provide an entry point at $t=1$ for filtering, as we cannot evaluate $t=-\infty$.
-Let us assume $`A_{t, :}|_{t \leq 0} = 0`$ so $`y_t|_{t \leq 0} = x_t|_{t \leq 0}`$, which also means $`\frac{\partial \mathcal{L}}{y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{x_t}|_{t \leq 0}`$.
+Let us assume $`A_{t, :}|_{t \leq 0} = 0`$ so $`y_t|_{t \leq 0} = x_t|_{t \leq 0}`$, which also means $`\frac{\partial \mathcal{L}}{\partial y_t}|_{t \leq 0} = \frac{\partial \mathcal{L}}{\partial x_t}|_{t \leq 0}`$.
 Thus, the initial condition gradients are
 
 $$
