@@ -84,7 +84,19 @@ y_t = x_t - \sum_{i=1}^N a_i y_{t-i}, \mathbf{a} = A_{1,:}.
 ```
 
 The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering $`\frac{\partial \mathcal{L}}{\partial \mathbf{y}}`$ with $\mathbf{a}$ backwards in time, same as in the time-varying case.
-$\frac{\partial \mathcal{L}}{\partial \mathbf{a}}$ is simply summing the gradients for $a_i$ at all the time steps $`\frac{\partial \mathcal{L}}{\partial a_i} = \sum_{t=1}^T \frac{\partial \mathcal{L}}{\partial x_t} y_{t-i}`$, which can be done by vecotr-matrix multiplication.
+$\frac{\partial \mathcal{L}}{\partial \mathbf{a}}$ is simply doing a vector-matrix multiplication:
+
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{a}}^T =
+-\frac{\partial \mathcal{L}}{\partial \mathbf{x}}^T
+\begin{vmatrix}
+y_0 & y_{-1} & \dots & y_{-N + 1} \\
+y_1 & y_0 & \dots & y_{-N + 2} \\
+\vdots & \vdots & \ddots & \vdots \\
+y_{T-1} & y_{T - 2} & \dots & y_{T - N}
+\end{vmatrix}.
+$$
+
 This algorithm is more efficient than [^2] because it only needs one pass of filtering to get the two gradients while the latter needs two.
 
 [^1]: [Differentiable All-pole Filters for Time-varying Audio Systems](https://arxiv.org/abs/2404.07970).
