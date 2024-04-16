@@ -97,8 +97,8 @@ The gradients $`\frac{\partial \mathcal{L}}{\partial \mathbf{x}}`$ are filtering
 $\frac{\partial \mathcal{L}}{\partial \mathbf{a}}$ is simply doing a vector-matrix multiplication:
 
 $$
-\frac{\partial \mathcal{L}}{\partial \mathbf{a}}^T =
--\frac{\partial \mathcal{L}}{\partial \mathbf{x}}^T
+\frac{\partial \mathcal{L}}{\partial \mathbf{a}^T} =
+-\frac{\partial \mathcal{L}}{\partial \mathbf{x}^T}
 \begin{vmatrix}
 y_0 & y_{-1} & \dots & y_{-N + 1} \\
 y_1 & y_0 & \dots & y_{-N + 2} \\
