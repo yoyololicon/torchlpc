@@ -2,8 +2,14 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from torch.autograd import Function
-from typing import Any, Tuple, Optional
+from typing import Any, Tuple, Optional, Callable
 from numba import jit, njit, prange, cuda, float32, float64, complex64, complex128
+
+
+lpc_cuda_kernel_float32: Callable
+lpc_cuda_kernel_float64: Callable
+lpc_cuda_kernel_complex64: Callable
+lpc_cuda_kernel_complex128: Callable
 
 
 for t in ["float32", "float64", "complex64", "complex128"]:
@@ -133,7 +139,9 @@ class LPC(Function):
             padded_grad_y = F.pad(grad_y.unsqueeze(1), (order, 0)).squeeze(1)
 
         flipped_grad_x = LPC.apply(
-            padded_grad_y.flip(1), shifted_A.flip(1).conj_physical(), torch.zeros_like(zi)
+            padded_grad_y.flip(1),
+            shifted_A.flip(1).conj_physical(),
+            torch.zeros_like(zi),
         )
 
         if ctx.needs_input_grad[2]:
