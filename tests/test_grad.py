@@ -4,30 +4,46 @@ from torch.autograd import gradcheck, gradgradcheck
 from torchlpc.core import LPC
 
 
-def create_test_inputs(batch_size, samples):
-    start_coeffs = [-0.9, 0.0]
-    end_coeffs = [0.0, 1]
+def get_random_biquads(cplx=False):
+    if cplx:
+        mag = torch.rand(2, dtype=torch.double)
+        phase = torch.rand(2, dtype=torch.double) * 2 * torch.pi
+        roots = mag * torch.exp(1j * phase)
+        return torch.tensor(
+            [-roots[0] - roots[1], roots[0] * roots[1]], dtype=torch.complex128
+        )
+    mag = torch.rand(1, dtype=torch.double)
+    phase = torch.rand(1, dtype=torch.double) * 2 * torch.pi
+    return torch.tensor([-mag * torch.cos(phase) * 2, mag**2], dtype=torch.double)
+
+
+def create_test_inputs(batch_size, samples, cplx=False):
+    start_coeffs = get_random_biquads(cplx)
+    end_coeffs = get_random_biquads(cplx)
+    dtype = torch.complex128 if cplx else torch.double
 
     A = (
         torch.stack(
-            [torch.linspace(start_coeffs[i], end_coeffs[i], samples) for i in range(2)]
+            [
+                torch.linspace(start_coeffs[i], end_coeffs[i], samples, dtype=dtype)
+                for i in range(2)
+            ]
         )
         .T.unsqueeze(0)
-        .double()
         .repeat(batch_size, 1, 1)
     )
-    x = torch.randn(batch_size, samples).double()
-    zi = torch.randn(batch_size, 2).double()
+    x = torch.randn(batch_size, samples, dtype=dtype)
+    zi = torch.randn(batch_size, 2, dtype=dtype)
     return x, A, zi
 
 
 @pytest.mark.parametrize(
     "x_requires_grad",
-    [True, False],
+    [True],
 )
 @pytest.mark.parametrize(
     "a_requires_grad",
-    [True],
+    [True, False],
 )
 @pytest.mark.parametrize(
     "zi_requires_grad",
@@ -37,14 +53,19 @@ def create_test_inputs(batch_size, samples):
     "samples",
     [32],
 )
+@pytest.mark.parametrize(
+    "cmplx",
+    [False, True],
+)
 def test_low_order_cpu(
     x_requires_grad: bool,
     a_requires_grad: bool,
     zi_requires_grad: bool,
     samples: int,
+    cmplx: bool,
 ):
     batch_size = 4
-    x, A, zi = create_test_inputs(batch_size, samples)
+    x, A, zi = create_test_inputs(batch_size, samples, cmplx)
     A.requires_grad = a_requires_grad
     x.requires_grad = x_requires_grad
     zi.requires_grad = zi_requires_grad
