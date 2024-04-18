@@ -4,8 +4,8 @@ from torch.autograd import gradcheck, gradgradcheck
 from torchlpc.core import LPC
 
 
-def get_random_biquads(cplx=False):
-    if cplx:
+def get_random_biquads(cmplx=False):
+    if cmplx:
         mag = torch.rand(2, dtype=torch.double)
         phase = torch.rand(2, dtype=torch.double) * 2 * torch.pi
         roots = mag * torch.exp(1j * phase)
@@ -13,14 +13,14 @@ def get_random_biquads(cplx=False):
             [-roots[0] - roots[1], roots[0] * roots[1]], dtype=torch.complex128
         )
     mag = torch.rand(1, dtype=torch.double)
-    phase = torch.rand(1, dtype=torch.double) * 2 * torch.pi
+    phase = torch.rand(1, dtype=torch.double) * torch.pi
     return torch.tensor([-mag * torch.cos(phase) * 2, mag**2], dtype=torch.double)
 
 
-def create_test_inputs(batch_size, samples, cplx=False):
-    start_coeffs = get_random_biquads(cplx)
-    end_coeffs = get_random_biquads(cplx)
-    dtype = torch.complex128 if cplx else torch.double
+def create_test_inputs(batch_size, samples, cmplx=False):
+    start_coeffs = get_random_biquads(cmplx)
+    end_coeffs = get_random_biquads(cmplx)
+    dtype = torch.complex128 if cmplx else torch.double
 
     A = (
         torch.stack(
@@ -55,7 +55,7 @@ def create_test_inputs(batch_size, samples, cplx=False):
 )
 @pytest.mark.parametrize(
     "cmplx",
-    [True],
+    [True, False],
 )
 @pytest.mark.parametrize(
     "device",
