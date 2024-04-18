@@ -12,7 +12,7 @@ lpc_cuda_kernel_complex64: Callable = None
 lpc_cuda_kernel_complex128: Callable = None
 
 
-for t in ["float32", "float64", "complex64", "complex128"]:
+for t in ["float32", "float64"]:
     exec(
         f"""@cuda.jit
 def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
@@ -46,6 +46,53 @@ def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
 
         if i == (order - 1):
             padded_y[b, t + order] = sm[circular_idx]"""
+    )
+
+# separate kernel for complex type as atomic.add does not support complex types
+for t, dt in zip(["complex64", "complex128"], ["float32", "float64"]):
+    exec(
+        f"""@cuda.jit
+def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
+    sm_real = cuda.shared.array(shape=(1024,), dtype={dt})
+    sm_imag = cuda.shared.array(shape=(1024,), dtype={dt})
+    batch_idx = cuda.blockIdx.x
+    tid = cuda.threadIdx.x
+
+    i = tid
+    b = batch_idx
+
+    if b >= B or i >= order:
+        return
+
+    circular_idx = 0
+    sm_real[i] = padded_y.real[b, i]
+    sm_imag[i] = padded_y.imag[b, i]
+
+    for t in range(T):
+        circular_idx = t % order
+        if i == (order - 1):
+            real = -A.real[b, t, i] * sm_real[circular_idx] + A.imag[b, t, i] * sm_imag[circular_idx]
+            imag = -A.real[b, t, i] * sm_imag[circular_idx] - A.imag[b, t, i] * sm_real[circular_idx]
+            sm_real[circular_idx] = real
+            sm_imag[circular_idx] = imag
+        cuda.syncthreads()
+
+        if i == (order - 1):
+            v_real = padded_y.real[b, t + order]
+            v_imag = padded_y.imag[b, t + order]
+        elif i > circular_idx - 1:
+            v_real = -A.real[b, t, i] * sm_real[circular_idx - i - 1 + order] + A.imag[b, t, i] * sm_imag[circular_idx - i - 1 + order]
+            v_imag = -A.real[b, t, i] * sm_imag[circular_idx - i - 1 + order] - A.imag[b, t, i] * sm_real[circular_idx - i - 1 + order]
+        else:
+            v_real = -A.real[b, t, i] * sm_real[circular_idx - i - 1] + A.imag[b, t, i] * sm_imag[circular_idx - i - 1]
+            v_imag = -A.real[b, t, i] * sm_imag[circular_idx - i - 1] - A.imag[b, t, i] * sm_real[circular_idx - i - 1]
+
+        cuda.atomic.add(sm_real, circular_idx, v_real)
+        cuda.atomic.add(sm_imag, circular_idx, v_imag)
+        cuda.syncthreads()
+
+        if i == (order - 1):
+            padded_y[b, t + order] = sm_real[circular_idx] + 1j * sm_imag[circular_idx]"""
     )
 
 
