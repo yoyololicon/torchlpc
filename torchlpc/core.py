@@ -112,25 +112,24 @@ def lpc_cuda(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor
     blocks_per_grid = B
     stream = cuda.stream()
 
-    match x.dtype:
-        case torch.float32:
-            runner = lpc_cuda_kernel_float32[
-                blocks_per_grid, threads_per_block, stream, 4 * order
-            ]
-        case torch.float64:
-            runner = lpc_cuda_kernel_float64[
-                blocks_per_grid, threads_per_block, stream, 8 * order
-            ]
-        case torch.complex64:
-            runner = lpc_cuda_kernel_complex64[
-                blocks_per_grid, threads_per_block, stream, 8 * order
-            ]
-        case torch.complex128:
-            runner = lpc_cuda_kernel_complex128[
-                blocks_per_grid, threads_per_block, stream, 16 * order
-            ]
-        case _:
-            raise NotImplementedError(f"Unsupported dtype: {x.dtype}")
+    if x.dtype == torch.float32:
+        runner = lpc_cuda_kernel_float32[
+            blocks_per_grid, threads_per_block, stream, 4 * order
+        ]
+    elif x.dtype == torch.float64:
+        runner = lpc_cuda_kernel_float64[
+            blocks_per_grid, threads_per_block, stream, 8 * order
+        ]
+    elif x.dtype == torch.complex64:
+        runner = lpc_cuda_kernel_complex64[
+            blocks_per_grid, threads_per_block, stream, 8 * order
+        ]
+    elif x.dtype == torch.complex128:
+        runner = lpc_cuda_kernel_complex128[
+            blocks_per_grid, threads_per_block, stream, 16 * order
+        ]
+    else:
+        raise NotImplementedError(f"Unsupported dtype: {x.dtype}")
 
     runner(cuda.as_cuda_array(padded_y), cuda.as_cuda_array(A), B, T, order)
 
