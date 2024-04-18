@@ -6,10 +6,10 @@ from typing import Any, Tuple, Optional, Callable
 from numba import jit, njit, prange, cuda, float32, float64, complex64, complex128
 
 
-lpc_cuda_kernel_float32: Callable
-lpc_cuda_kernel_float64: Callable
-lpc_cuda_kernel_complex64: Callable
-lpc_cuda_kernel_complex128: Callable
+lpc_cuda_kernel_float32: Callable = None
+lpc_cuda_kernel_float64: Callable = None
+lpc_cuda_kernel_complex64: Callable = None
+lpc_cuda_kernel_complex128: Callable = None
 
 
 for t in ["float32", "float64", "complex64", "complex128"]:
