@@ -133,7 +133,7 @@ class LPC(Function):
             padded_grad_y = F.pad(grad_y.unsqueeze(1), (order, 0)).squeeze(1)
 
         flipped_grad_x = LPC.apply(
-            padded_grad_y.flip(1), shifted_A.flip(1), torch.zeros_like(zi)
+            padded_grad_y.flip(1), shifted_A.flip(1).conj_physical(), torch.zeros_like(zi)
         )
 
         if ctx.needs_input_grad[2]:
@@ -148,7 +148,7 @@ class LPC(Function):
             padded_y = torch.cat([zi.flip(1), valid_y], dim=1)
 
             unfolded_y = padded_y.unfold(1, order, 1).flip(2)
-            grad_A = unfolded_y * -flipped_grad_x.flip(1).unsqueeze(2)
+            grad_A = unfolded_y.conj_physical() * -flipped_grad_x.flip(1).unsqueeze(2)
 
         return grad_x, grad_A, grad_zi
 
