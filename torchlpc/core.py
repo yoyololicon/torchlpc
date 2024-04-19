@@ -137,7 +137,7 @@ def lpc_cuda(x: torch.Tensor, A: torch.Tensor, zi: torch.Tensor) -> torch.Tensor
 
 
 @njit(parallel=True)
-def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> None:
+def lpc_np(x: np.ndarray, A: np.ndarray, zi: np.ndarray) -> np.ndarray:
     B, T = x.shape
     order = zi.shape[1]
     padded_y = np.empty((B, T + order), dtype=x.dtype)
