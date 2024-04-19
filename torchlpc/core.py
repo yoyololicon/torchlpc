@@ -39,14 +39,14 @@ def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
         
         v = a * s
 
-        if i == 0:
+        if i == (order - 1):
             sm[circular_idx] = v
             v = padded_y[b, t + order]
         cuda.syncthreads()
         cuda.atomic.add(sm, circular_idx, v)
         cuda.syncthreads()
 
-        if i == 0:
+        if i == (order - 1):
             padded_y[b, t + order] = sm[circular_idx]"""
     )
 
@@ -85,7 +85,7 @@ def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
         v_real = a.real * s_real - a.imag * s_imag
         v_imag = a.real * s_imag + a.imag * s_real
         
-        if i == 0:
+        if i == (order - 1):
             sm_real[circular_idx] = v_real
             sm_imag[circular_idx] = v_imag
             v_real = padded_y.real[b, t + order]
@@ -96,7 +96,7 @@ def lpc_cuda_kernel_{t}(padded_y, A, B, T, order) -> None:
         cuda.atomic.add(sm_imag, circular_idx, v_imag)
         cuda.syncthreads()
 
-        if i == 0:
+        if i == (order - 1):
             padded_y[b, t + order] = sm_real[circular_idx] + 1j * sm_imag[circular_idx]"""
     )
 
