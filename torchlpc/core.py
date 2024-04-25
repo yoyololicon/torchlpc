@@ -180,7 +180,12 @@ class LPC(Function):
             unfolded_y = padded_y.unfold(1, order, 1).flip(2)
             grad_A = unfolded_y * -flipped_grad_x.flip(1).unsqueeze(2)
 
-        del ctx.y, ctx.A, ctx.zi
+        if hasattr(ctx, "y"):
+            del ctx.y
+        if hasattr(ctx, "A"):
+            del ctx.A
+        if hasattr(ctx, "zi"):
+            del ctx.zi
         return grad_x, grad_A, grad_zi
 
     @staticmethod
