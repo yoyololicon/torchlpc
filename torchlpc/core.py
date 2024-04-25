@@ -180,6 +180,12 @@ class LPC(Function):
             unfolded_y = padded_y.unfold(1, order, 1).flip(2)
             grad_A = unfolded_y * -flipped_grad_x.flip(1).unsqueeze(2)
 
+        if hasattr(ctx, "y"):
+            del ctx.y
+        if hasattr(ctx, "A"):
+            del ctx.A
+        if hasattr(ctx, "zi"):
+            del ctx.zi
         return grad_x, grad_A, grad_zi
 
     @staticmethod
@@ -199,4 +205,5 @@ class LPC(Function):
             fwd_A = -torch.sum(unfolded_y * grad_A, dim=2)
             fwd_x = fwd_x + fwd_A
 
+        del ctx.y, ctx.A, ctx.zi
         return LPC.apply(fwd_x, A, fwd_zi)
