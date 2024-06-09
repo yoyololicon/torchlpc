@@ -1,6 +1,5 @@
 #include <torch/extension.h>
 #include <torch/script.h>
-#include "/opt/homebrew/opt/libomp/include/omp.h"
 
 torch::Tensor torchlpc_forward(torch::Tensor x, torch::Tensor a, torch::Tensor zi) {
     // Ensure input dimensions are correct
@@ -15,7 +14,8 @@ torch::Tensor torchlpc_forward(torch::Tensor x, torch::Tensor a, torch::Tensor z
     const auto order = a.size(2);
 
     // Ensure the zi tensor is the correct size
-    TORCH_CHECK(zi.sizes() == torch::IntArrayRef({B, order}), "zi must have shape (B, order)");
+    TORCH_CHECK(zi.sizes() == torch::IntArrayRef({B, order}),
+                                                 "zi must have shape (B, order)");
 
     // Flip zi and a to match scipy.signal.lfilter
     zi = torch::flip(zi, {1});
