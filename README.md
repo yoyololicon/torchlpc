@@ -45,7 +45,7 @@ pip install git+https://github.com/yoyololicon/torchlpc.git
 
 ## Derivation of the gradients of the LPC filter
 
-The details of the derivation can be found in our preprint **Differentiable All-pole Filters for Time-varying Audio Systems**[^1].
+The details of the derivation can be found in our preprints[^1][^2].
 We show that, given the instataneous gradient $\frac{\partial \mathcal{L}}{\partial y_t}$ where $\mathcal{L}$ is the loss function, the gradients of the LPC filter with respect to the input signal $\bf x$ and the filter coefficients $\bf A$ can be expresssed also through a time-varying filter:
 
 ```math
@@ -107,10 +107,11 @@ y_{T-1} & y_{T - 2} & \dots & y_{T - N}
 \end{vmatrix}.
 $$
 
-This algorithm is more efficient than [^2] because it only needs one pass of filtering to get the two gradients while the latter needs two.
+This algorithm is more efficient than [^3] because it only needs one pass of filtering to get the two gradients while the latter needs two.
 
 [^1]: [Differentiable All-pole Filters for Time-varying Audio Systems](https://arxiv.org/abs/2404.07970).
-[^2]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
+[^2]: [Differentiable Time-Varying Linear Prediction in the Context of End-to-End Analysis-by-Synthesis](https://arxiv.org/abs/2406.05128).
+[^3]: [Singing Voice Synthesis Using Differentiable LPC and Glottal-Flow-Inspired Wavetables](https://arxiv.org/abs/2306.17252).
 
 ## TODO
 
@@ -120,7 +121,7 @@ This algorithm is more efficient than [^2] because it only needs one pass of fil
 
 ## Citation
 
-If you find this repository useful in your research, please cite our work with the following BibTex entry:
+If you find this repository useful in your research, please cite our work with the following BibTex entries:
 
 ```bibtex
 @misc{ycy2024diffapf,
@@ -128,6 +129,15 @@ If you find this repository useful in your research, please cite our work with t
     author={Chin-Yun Yu and Christopher Mitcheltree and Alistair Carson and Stefan Bilbao and Joshua D. Reiss and György Fazekas},
     year={2024},
     eprint={2404.07970},
+    archivePrefix={arXiv},
+    primaryClass={eess.AS}
+}
+
+@misc{ycy2024golf,
+    title = {Differentiable Time-Varying Linear Prediction in the Context of End-to-End Analysis-by-Synthesis},
+    author = {Yu, Chin-Yun and Fazekas, György},
+    year={2024},
+    eprint={2406.05128},
     archivePrefix={arXiv},
     primaryClass={eess.AS}
 }
