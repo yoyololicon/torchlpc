@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # torch.set_num_threads(1)
 
     torch.utils.cpp_extension.load(
-        name="forward",
+        name="torchlpc",
         sources=["torchlpc.cpp"],
         is_python_module=False,
         verbose=True
