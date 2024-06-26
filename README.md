@@ -119,6 +119,11 @@ This algorithm is more efficient than [^3] because it only needs one pass of fil
 - [ ] Use native CUDA kernels for GPU computation.
 - [ ] Add examples.
 
+## Related Projects
+
+- [torchcomp](https://github.com/yoyololicon/torchcomp): differentiable compressors that use `torchlpc` for differentiable backpropagation.
+- [jaxpole](https://github.com/rodrigodzf/jaxpole): equivalent implementation in JAX by @rodrigodzf.
+
 ## Citation
 
 If you find this repository useful in your research, please cite our work with the following BibTex entries:
