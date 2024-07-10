@@ -12,7 +12,12 @@ from .test_grad import create_test_inputs
     "device",
     [
         "cpu",
-        "cuda",
+        pytest.param(
+            "cuda",
+            marks=pytest.mark.skipif(
+                not torch.cuda.is_available(), reason="CUDA not available"
+            ),
+        ),
     ],
 )
 def test_hessian(device: str):
