@@ -2,6 +2,8 @@ import torch
 from typing import Optional
 
 from .core import LPC
+from .parallel_scan import WARPSIZE
+from .recurrence import RecurrenceCUDA
 
 __all__ = ["sample_wise_lpc"]
 
@@ -34,5 +36,8 @@ def sample_wise_lpc(
         zi = a.new_zeros(B, order)
     else:
         assert zi.shape == (B, order)
+
+    if order == 1 and x.is_cuda and B * WARPSIZE < T:
+        return RecurrenceCUDA.apply(-a.squeeze(2), x, zi.squeeze(1))
 
     return LPC.apply(x, a, zi)
