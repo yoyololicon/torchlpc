@@ -1,7 +1,7 @@
 import setuptools
 
 NAME = "torchlpc"
-VERSION = "0.4"
+VERSION = "0.5"
 MAINTAINER = "Chin-Yun Yu"
 EMAIL = "chin-yun.yu@qmul.ac.uk"
 
