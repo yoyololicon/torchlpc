@@ -178,7 +178,7 @@ class LPC(Function):
 
     @staticmethod
     def backward(
-        ctx, grad_y: torch.Tensor
+        ctx: Any, grad_y: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
         A, zi, y = ctx.saved_tensors
         grad_x = grad_A = grad_zi = None

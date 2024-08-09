@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Function
 from numba import cuda
+from typing import Any
 
 from .parallel_scan import compute_linear_recurrence
 
@@ -9,7 +10,10 @@ from .parallel_scan import compute_linear_recurrence
 class RecurrenceCUDA(Function):
     @staticmethod
     def forward(
-        ctx, decay: torch.Tensor, impulse: torch.Tensor, initial_state: torch.Tensor
+        ctx: Any,
+        decay: torch.Tensor,
+        impulse: torch.Tensor,
+        initial_state: torch.Tensor,
     ) -> torch.Tensor:
         n_dims, n_steps = decay.shape
         out = torch.empty_like(impulse)
@@ -25,7 +29,7 @@ class RecurrenceCUDA(Function):
         return out
 
     @staticmethod
-    def backward(ctx: torch.Any, grad_out: torch.Tensor) -> torch.Tensor:
+    def backward(ctx: Any, grad_out: torch.Tensor) -> torch.Tensor:
         decay, initial_state, out = ctx.saved_tensors
         grad_decay = grad_impulse = grad_initial_state = None
         n_dims, _ = decay.shape
