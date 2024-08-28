@@ -2,6 +2,7 @@ import itertools
 import logging
 import os
 
+import numba
 import torch as tr
 import torch.utils.cpp_extension
 from torch.utils import benchmark
@@ -36,6 +37,12 @@ num_threads = 1
 
 def main() -> None:
     tr.manual_seed(42)
+    # Set intraop threads
+    tr.set_num_threads(num_threads)
+    # Set interop threads
+    tr.set_num_interop_threads(num_threads)
+    numba.set_num_threads(num_threads)
+    log.info(f"numba.get_num_threads(): {numba.get_num_threads()}")
 
     results = []
 
@@ -59,10 +66,10 @@ def main() -> None:
                 benchmark.Timer(
                     stmt="y = forward_func(x, a, zi)",
                     globals=globals,
-                    sub_label=f"bs_{bs}__n_{n}__order_{order}",
+                    sub_label=f"bs_{bs}__n_{n}__order_{order}__threads_{num_threads}",
                     description=forward_func.__name__,
                     num_threads=num_threads,
-                ).blocked_autorange(min_run_time=1)
+                ).blocked_autorange(min_run_time=0.5)
             )
 
     compare = benchmark.Compare(results)
