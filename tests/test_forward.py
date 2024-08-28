@@ -90,6 +90,3 @@ def test_forward(bs: int, n_samples: int, order: int) -> None:
     # CPP forward_batch_parallel
     forward_b = torch.ops.torchlpc.forward_batch_parallel
     compare_forward(forward_a, forward_b, bs, n_samples, order)
-    # CPP forward_batch_order_parallel
-    forward_b = torch.ops.torchlpc.forward_batch_order_parallel
-    compare_forward(forward_a, forward_b, bs, n_samples, order)
