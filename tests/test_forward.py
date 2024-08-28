@@ -5,12 +5,11 @@ from typing import Optional, Callable
 import pytest
 import torch as tr
 import torch.utils.cpp_extension
-import torch.utils.cpp_extension
 from torch import Tensor as T
 
 from torchlpc import sample_wise_lpc
 
-torch.utils.cpp_extension.load(
+tr.utils.cpp_extension.load(
     name="torchlpc",
     sources=["../torchlpc/csrc/torchlpc.cpp"],
     is_python_module=False,
@@ -59,9 +58,9 @@ def compare_forward(forward_a: Callable[[T, T, Optional[T]], T],
         dtype = tr.double
     else:
         dtype = tr.float
-    x = torch.randn(bs, n_samples, dtype=dtype)
-    a = torch.randn(bs, n_samples, order, dtype=dtype)
-    zi = torch.randn(bs, order, dtype=dtype)
+    x = tr.randn(bs, n_samples, dtype=dtype)
+    a = tr.randn(bs, n_samples, order, dtype=dtype)
+    zi = tr.randn(bs, order, dtype=dtype)
     result_a = forward_a(x, a, zi)
     result_b = forward_b(x, a, zi)
     assert tr.allclose(result_a, result_b, rtol=rtol, atol=atol)
@@ -85,8 +84,8 @@ def test_forward(bs: int, n_samples: int, order: int) -> None:
     forward_b = sample_wise_lpc_scriptable
     compare_forward(forward_a, forward_b, bs, n_samples, order)
     # CPP forward
-    forward_b = torch.ops.torchlpc.forward
+    forward_b = tr.ops.torchlpc.forward
     compare_forward(forward_a, forward_b, bs, n_samples, order)
     # CPP forward_batch_parallel
-    forward_b = torch.ops.torchlpc.forward_batch_parallel
+    forward_b = tr.ops.torchlpc.forward_batch_parallel
     compare_forward(forward_a, forward_b, bs, n_samples, order)
