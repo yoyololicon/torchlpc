@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch.func import hessian, jacfwd
+from torch.func import jacfwd
 import pytest
 from torchlpc.core import LPC
 from torchlpc.recurrence import RecurrenceCUDA
