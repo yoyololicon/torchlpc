@@ -1,6 +1,6 @@
 import pytest
 import torch
-from torch.autograd import gradcheck, gradgradcheck
+from torch.autograd.gradcheck import gradcheck, gradgradcheck
 from torchlpc.core import LPC
 
 
