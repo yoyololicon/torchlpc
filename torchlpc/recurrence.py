@@ -88,7 +88,7 @@ class RecurrenceCUDA(Function):
 
         if grad_decay is not None:
             concat_out = torch.cat([initial_state.unsqueeze(1), out[:, :-1]], dim=1)
-            fwd_decay = -concat_out * grad_decay
+            fwd_decay = concat_out * grad_decay
             fwd_impulse = fwd_impulse + fwd_decay
 
         return RecurrenceCUDA.apply(decay, fwd_impulse, fwd_initial_state)
