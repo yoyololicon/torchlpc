@@ -2,6 +2,7 @@ import pytest
 import torch
 from torch.autograd.gradcheck import gradcheck, gradgradcheck
 from torchlpc.core import LPC
+from torchlpc.recurrence import RecurrenceCUDA
 
 
 def get_random_biquads(cmplx=False):
@@ -131,12 +132,12 @@ def test_cuda_parallel_scan(
     batch_size = 2
     samples = 123
     x = torch.randn(batch_size, samples, dtype=torch.double, device="cuda")
-    A = torch.rand(batch_size, samples, 1, dtype=torch.double, device="cuda") * 2 - 1
-    zi = torch.randn(batch_size, 1, dtype=torch.double, device="cuda")
+    A = torch.rand(batch_size, samples, dtype=torch.double, device="cuda") * 2 - 1
+    zi = torch.randn(batch_size, dtype=torch.double, device="cuda")
 
     A.requires_grad = a_requires_grad
     x.requires_grad = x_requires_grad
     zi.requires_grad = zi_requires_grad
 
-    assert gradcheck(LPC.apply, (x, A, zi), check_forward_ad=True)
-    assert gradgradcheck(LPC.apply, (x, A, zi))
+    assert gradcheck(RecurrenceCUDA.apply, (A, x, zi), check_forward_ad=True)
+    assert gradgradcheck(RecurrenceCUDA.apply, (A, x, zi))

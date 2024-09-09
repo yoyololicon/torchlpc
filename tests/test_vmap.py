@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torch.func import hessian, jacfwd
 import pytest
 from torchlpc.core import LPC
+from torchlpc.recurrence import RecurrenceCUDA
 
 
 from .test_grad import create_test_inputs
@@ -52,8 +53,8 @@ def test_cuda_parallel_scan_vmap():
     batch_size = 3
     samples = 255
     x = torch.randn(batch_size, samples, dtype=torch.double, device="cuda")
-    A = torch.rand(batch_size, samples, 1, dtype=torch.double, device="cuda") * 2 - 1
-    zi = torch.randn(batch_size, 1, dtype=torch.double, device="cuda")
+    A = torch.rand(batch_size, samples, dtype=torch.double, device="cuda") * 2 - 1
+    zi = torch.randn(batch_size, dtype=torch.double, device="cuda")
     y = torch.randn(batch_size, samples, dtype=torch.double, device="cuda")
 
     A.requires_grad = True
@@ -63,7 +64,7 @@ def test_cuda_parallel_scan_vmap():
     args = (x, A, zi)
 
     def func(x, A, zi):
-        return F.mse_loss(LPC.apply(x, A, zi), y)
+        return F.mse_loss(RecurrenceCUDA.apply(A, x, zi), y)
 
     jacs = jacfwd(func, argnums=tuple(range(len(args))))(*args)
 
