@@ -10,7 +10,6 @@ from .parallel_scan import compute_linear_recurrence
 class RecurrenceCUDA(Function):
     @staticmethod
     def forward(
-        ctx: Any,
         decay: torch.Tensor,
         impulse: torch.Tensor,
         initial_state: torch.Tensor,
