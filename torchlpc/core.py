@@ -2,8 +2,7 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from torch.autograd import Function
-from typing import Any, Tuple, Optional, Callable
-from itertools import starmap
+from typing import Any, Tuple, Optional, Callable, List
 from numba import jit, njit, prange, cuda, float32, float64, complex64, complex128
 
 
@@ -167,16 +166,10 @@ class LPC(Function):
                 zi.detach().cpu().numpy(),
             )
             y = torch.from_numpy(y).to(x.device, x.dtype)
-        # ctx.save_for_backward(A, zi, y)
-
-        # # for jvp
-        # ctx.y = y
-        # ctx.A = A
-        # ctx.zi = zi
         return y
 
     @staticmethod
-    def setup_context(ctx: Any, inputs: Tuple[Any], output: Any) -> Any:
+    def setup_context(ctx: Any, inputs: List[Any], output: Any) -> Any:
         _, A, zi = inputs
         y = output
         ctx.save_for_backward(A, zi, y)
@@ -184,8 +177,8 @@ class LPC(Function):
 
     @staticmethod
     def backward(
-        ctx, grad_y: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
+        ctx: Any, grad_y: torch.Tensor
+    ) -> Tuple[Optional[torch.Tensor], Optional[torch.Tensor], Optional[torch.Tensor]]:
         A, zi, y = ctx.saved_tensors
         grad_x = grad_A = grad_zi = None
         B, T, order = A.shape
@@ -225,12 +218,6 @@ class LPC(Function):
             unfolded_y = padded_y.unfold(1, order, 1).flip(2)
             grad_A = unfolded_y.conj_physical() * -flipped_grad_x.flip(1).unsqueeze(2)
 
-        # if hasattr(ctx, "y"):
-        #     del ctx.y
-        # if hasattr(ctx, "A"):
-        #     del ctx.A
-        # if hasattr(ctx, "zi"):
-        #     del ctx.zi
         return grad_x, grad_A, grad_zi
 
     @staticmethod
@@ -250,7 +237,6 @@ class LPC(Function):
             fwd_A = -torch.sum(unfolded_y * grad_A, dim=2)
             fwd_x = fwd_x + fwd_A
 
-        # del ctx.y, ctx.A, ctx.zi
         return LPC.apply(fwd_x, A, fwd_zi)
 
     @staticmethod
@@ -263,7 +249,7 @@ class LPC(Function):
         x, A, zi = tuple(
             map(
                 lambda x: x.reshape(-1, *x.shape[2:]),
-                starmap(maybe_expand_bdim_at_front, zip(args, in_dims)),
+                map(maybe_expand_bdim_at_front, args, in_dims),
             )
         )
 
