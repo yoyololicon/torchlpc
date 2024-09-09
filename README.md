@@ -129,21 +129,20 @@ This algorithm is more efficient than [^3] because it only needs one pass of fil
 If you find this repository useful in your research, please cite our work with the following BibTex entries:
 
 ```bibtex
-@misc{ycy2024diffapf,
+@inproceedings{ycy2024diffapf,
     title={Differentiable All-pole Filters for Time-varying Audio Systems},
     author={Chin-Yun Yu and Christopher Mitcheltree and Alistair Carson and Stefan Bilbao and Joshua D. Reiss and György Fazekas},
+    booktitle={International Conference on Digital Audio Effects (DAFx)},
     year={2024},
-    eprint={2404.07970},
-    archivePrefix={arXiv},
-    primaryClass={eess.AS}
+    pages={345--352},
 }
 
-@misc{ycy2024golf,
-    title = {Differentiable Time-Varying Linear Prediction in the Context of End-to-End Analysis-by-Synthesis},
-    author = {Yu, Chin-Yun and Fazekas, György},
-    year={2024},
-    eprint={2406.05128},
-    archivePrefix={arXiv},
-    primaryClass={eess.AS}
+@inproceedings{ycy2024golf,
+    title     = {Differentiable Time-Varying Linear Prediction in the Context of End-to-End Analysis-by-Synthesis},
+    author    = {Chin-Yun Yu and György Fazekas},
+    year      = {2024},
+    booktitle = {Proc. Interspeech},
+    pages     = {1820--1824},
+    doi       = {10.21437/Interspeech.2024-1187},
 }
 ```
