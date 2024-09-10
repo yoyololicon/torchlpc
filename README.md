@@ -1,4 +1,5 @@
 # TorchLPC
+[![PyPI version](https://badge.fury.io/py/torchlpc.svg)](https://badge.fury.io/py/torchlpc)
 
 `torchlpc` provides a PyTorch implementation of the Linear Predictive Coding (LPC) filter, also known as all-pole filter.
 It's fast, differentiable, and supports batched inputs with time-varying filter coefficients.
