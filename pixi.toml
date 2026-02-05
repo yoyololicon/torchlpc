@@ -8,6 +8,7 @@ platforms = ["linux-64"]
 [dependencies]
 numpy = ">=2.3.5,<3"
 numba = ">=0.63.1,<0.64"
+tqdm = ">=4.67.3,<5"
 
 [pypi-dependencies]
 torchlpc = { path = ".", editable = true }
