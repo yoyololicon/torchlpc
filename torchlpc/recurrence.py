@@ -46,11 +46,11 @@ def _cuda_recurrence(
     impulse: torch.Tensor, decay: torch.Tensor, initial_state: torch.Tensor
 ) -> torch.Tensor:
     n_dims, n_steps = decay.shape
-    if impulse.dtype is torch.float32:
+    if impulse.is_floating_point():
         try:
-            from pararnn.parallel_reduction.parallel_reduction import ParallelSolve
+            import pararnn.parallel_reduction.parallel_reduction
 
-            return ParallelSolve.parallel_reduce_diag_cuda(
+            return torch.ops.parallel_reduce_cuda.parallel_reduce_diag_cuda(
                 F.pad(-decay, (1, 0)),
                 torch.cat([initial_state.unsqueeze(1), impulse], dim=1),
             )[:, 1:]
