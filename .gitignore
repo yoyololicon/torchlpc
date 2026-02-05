@@ -4,3 +4,6 @@
 *.nbi
 build/
 *.egg*
+# pixi environments
+.pixi/*
+!.pixi/config.toml

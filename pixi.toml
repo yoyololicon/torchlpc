@@ -1,0 +1,44 @@
+[workspace]
+authors = ["Chin-Yun Yu <chin-yun.yu@qmul.ac.uk>"]
+channels = ["conda-forge", "nvidia"]
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+numpy = ">=2.3.5,<3"
+numba = ">=0.63.1,<0.64"
+
+[pypi-dependencies]
+torchlpc = { path = ".", editable = true }
+
+[feature.dev.pypi-dependencies]
+build = ">=1.4.0, <2"
+setuptools-git-versioning = ">=3.0.1, <4"
+
+[feature.test.dependencies]
+pytest = ">=9.0.2,<10"
+pytest-cov = ">=7.0.0,<8"
+scipy = ">=1.17.0,<2"
+
+[feature.cpu.dependencies]
+pytorch-cpu = ">=2.10.0,<3"
+
+[feature.gpu.dependencies]
+cuda-version = ">=13.1,<14"
+pytorch-gpu = ">=2.10.0,<3"
+numba-cuda = ">=0.26.0,<0.27"
+cuda = { version = ">=13.1.1,<14", channel = "nvidia" }
+
+[feature.gpu.system-requirements]
+cuda = "13.0"
+
+[feature.gpu.pypi-options]
+no-build-isolation = true
+
+[environments]
+default = ["gpu"]
+cpu = ["cpu"]
+gpu-test = ["gpu", "test"]
+cpu-test = ["cpu", "test"]
+build = ["dev", "cpu"]
