@@ -54,6 +54,9 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["pytest >= 6.0", "scipy", "numpy", "pytest-cov"]
+extra = [
+    "pararnn @ git+https://github.com/yoyolicoris/ml-pararnn.git@fix/installable",
+]
 
 
 [tool.pytest.ini_options]

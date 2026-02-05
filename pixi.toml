@@ -36,6 +36,9 @@ cuda = "13.0"
 [feature.gpu.pypi-options]
 no-build-isolation = true
 
+[feature.gpu.pypi-dependencies]
+torchlpc = { path = ".", editable = true, extras = ["extra"] }
+
 [environments]
 default = ["gpu"]
 cpu = ["cpu"]
