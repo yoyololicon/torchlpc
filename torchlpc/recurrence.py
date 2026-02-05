@@ -46,16 +46,24 @@ def _cuda_recurrence(
     impulse: torch.Tensor, decay: torch.Tensor, initial_state: torch.Tensor
 ) -> torch.Tensor:
     n_dims, n_steps = decay.shape
-    if impulse.is_floating_point():
-        try:
-            import pararnn.parallel_reduction.parallel_reduction
-
-            return torch.ops.parallel_reduce_cuda.parallel_reduce_diag_cuda(
-                F.pad(-decay, (1, 0)),
-                torch.cat([initial_state.unsqueeze(1), impulse], dim=1),
-            )[:, 1:]
-        except ImportError:
-            pass
+    try:
+        import pararnn.parallel_reduction.parallel_reduction
+    except ImportError:
+        pass
+    else:
+        jac = F.pad(-decay, (1, 0))
+        rhs = torch.cat([initial_state.unsqueeze(1), impulse], dim=1)
+        if decay.is_complex():
+            jac = torch.stack(
+                [jac.real, -jac.imag, jac.imag, jac.real], dim=-1
+            ).unflatten(-1, (2, 2))
+            rhs = torch.view_as_real(rhs)
+            return torch.view_as_complex(
+                torch.ops.parallel_reduce_cuda.parallel_reduce_block_diag_2x2_cuda(
+                    jac, rhs
+                )[:, 1:]
+            )
+        return torch.ops.parallel_reduce_cuda.parallel_reduce_diag_cuda(jac, rhs)[:, 1:]
 
     if n_dims * WARPSIZE < n_steps:
         runner = scan_cuda_runner
